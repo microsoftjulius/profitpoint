@@ -50,7 +50,7 @@ class ProfilesController extends Controller
     }
 
     /**
-     * This function updates the user function
+     * This function updates the user password
      */
     private function updateUserPassword(){
         $new_password = request()->npassword;

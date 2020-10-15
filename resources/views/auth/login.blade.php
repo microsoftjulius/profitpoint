@@ -2,17 +2,30 @@
 <html lang="en">
     
 <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-        <meta name="description" content="">
-        <meta name="author" content="">
-        
-        <title>Profit point</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <title>Profit point</title>
 
-        <link href="{{ asset('design/css/style.default.css')}}" rel="stylesheet">
-    </head>
+    <link href="{{ asset('design/css/style.default.css')}}" rel="stylesheet">
+    <style type="text/javascript">
+        #show_bg_2 {
+        background-image:
+        linear-gradient(to bottom, rgba(245, 246, 252, 0.52), rgba(117, 19, 93, 0.73)),
+        url();
+        width: 80%;
+        height: 400px;
+        background-size: cover;
+        color: white;
+        padding: 20px;
+    }
+    </style>
+</head>
 
-    <body class="signin">
+    <body class="signin" style="background-image: url('{{ asset("design/images/background.jpg")}}'); background-repeat: no-repeat;
+        background-attachment: fixed;  background-size: cover; linear-gradient(to bottom, rgba(245, 246, 252, 0.52), rgba(117, 19, 93, 0.73)),">
         
         
         <section>
