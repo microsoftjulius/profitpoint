@@ -2,14 +2,6 @@
 <html lang="en">
 <link href="{{ asset('/design/css/style.default.css')}}" rel="stylesheet">
 <link href="{{ asset('/design/css/select2.css')}}" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" /> 
-
-  <style> 
-    .qr-code { 
-      max-width: 200px; 
-      margin: 10px; 
-    } 
-  </style> 
 
     <body>
         
@@ -18,7 +10,6 @@
             <div class="mainwrapper">
                 @include('layouts.sidebar')
                 <div class="mainpanel">
-                    @include('layouts.breadcrumb')
                     <div class="contentpanel">
                         <div class="row">
                             <div class="contentpanel contentpanel-wizard">
@@ -28,54 +19,22 @@
                                     <div class="col-lg-3"></div>
                                     <div class="col-md-6">
                                         <!-- BASIC WIZARD -->
-                                        <form method="get" id="basicWizard" class="panel-wizard" action="/make-investment">
-                                            <ul class="nav nav-justified nav-wizard">
-                                                <li><a href="#tab1" data-toggle="tab"> Mobile Money </a></li>
-                                                <li><a href="#tab2" data-toggle="tab"> Bitcoin </a></li>
-                                            </ul>
-                                            <div class="tab-content">
-                                                <div class="tab-pane" id="tab1">
-                                                    <div class="form-group">
+                                        <form method="get" id="basicWizard" class="panel-wizard" action="/update-withdraw/{{request()->route()->withdraw_id}}">
+                                            
+                                                    @foreach($withdraw as $with)
                                                         <label class="col-sm-4">Amount</label>
                                                         <div class="col-sm-8">
-                                                            <input type="number" name="amount" class="form-control" value="{{ old('amount') }}"/>
+                                                            <input type="number" name="withdraw_edit" class="form-control" value="{{ $with->amount }}"/>
                                                         </div>
+                                                    @endforeach
                                                     </div><!-- form-group -->
                                                     
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4">Phone Number</label>
-                                                        <div class="col-sm-8">
-                                                            <input type="text" name="phone_number" class="form-control" value="{{ old('phone_number') }}"/>
-                                                        </div>
-                                                    </div><!-- form-group -->
                                                     <div class="row">
                                                         <div class="col-lg-4"></div>
                                                         <div class="col-lg-4">
-                                                            <button class="btn btn-sm btn-primary">Invest</button>
+                                                            <button class="btn btn-sm btn-primary">Update</button>
                                                         </div>
                                                         <div class="col-lg-4"></div>
-                                                    </div>
-                                                </div><!-- tab-pane -->
-                                                
-                                                <div class="tab-pane" id="tab2">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4">Note:</label>
-                                                        <div class="col-sm-5">
-                                                            Ensure that you send Bitcoin to the right address.
-                                                            Kindly note that sending Bitcoin to a wrong address is irreversible.
-                                                        </div>
-                                                    </div><!-- form-group -->
-                                                    <div class="row">
-                                                        <div class="col-lg-4"></div>
-                                                        <div class="col-lg-4">
-                                                            <button class="btn btn-sm btn-primary" type="button" data-toggle="modal" data-target="#exampleModal">I Understand</button>
-                                                        </div>
-                                                        <div class="col-lg-4"></div>
-                                                        <input type="radio" name="type" value="bitcoin" hidden>
-                                                    </div>
-                                                </div><!-- tab-pane -->
-                                            </div><!-- tab-content -->
-                        
                                             <ul class="list-unstyled wizard">
                                             </ul>
                                         </form><!-- #basicWizard -->
@@ -92,71 +51,7 @@
             </div><!-- mainwrapper -->
         </section>
 
-        <!-- Modal -->
-        <div class="modal fade bd-example-modal-sm" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-body">
-                    <div class="container-fluid"> 
-                    <div class="text-center"> 
-                      <!-- Get a Placeholder image initially, 
-                       this will change according to the 
-                       data entered later -->
-                      <img src="https://chart.googleapis.com/chart?cht=qr&chl=Hello+World&chs=160x160&chld=L|0" class="qr-code img-thumbnail img-responsive" /> 
-                    </div> <br>
-                    <div class="row form-horizontal"> 
-                      <div class="col-lg-12">
-                          <div class="col-lg-4 text-right">
-                              Address:
-                          </div>
-                          <div class="col-lg-5">
-                              37BBjLiVLFzgspJ7ytQj9BiakV8oXyiRp2
-                          </div>
-                      </div>
-                    </div><br>
-                    <div class="col-lg-12">
-                      <div class="col-lg-4 text-right">
-                          Currency:
-                      </div>
-                      <div class="col-lg-5">
-                          BTC Wallet
-                      </div>
-                    </div>
-                  </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <script> 
-            // Function to HTML encode the text 
-            // This creates a new hidden element, 
-            // inserts the given text into it  
-            // and outputs it out as HTML 
-            function htmlEncode(value) { 
-              return $('<div/>').text(value) 
-                .html(); 
-            } 
-          
-            $(function () { 
-          
-              // Specify an onclick function 
-              // for the generate button 
-              $('#generate').click(function () { 
-          
-                // Generate the link that would be 
-                // used to generate the QR Code 
-                // with the given data  
-                let finalURL = 
-            'https://chart.googleapis.com/chart?cht=qr&chl=' + 
-                  htmlEncode($('#content').val()) + 
-                  '&chs=160x160&chld=L|0' 
-          
-                // Replace the src of the image with 
-                // the QR code image 
-                $('.qr-code').attr('src', finalURL); 
-              }); 
-            }); 
-      </script> 
+        
         <script src="{{ asset('design/js/jquery-1.11.1.min.js')}}"></script>
         <script src="{{ asset('design/js/jquery-migrate-1.2.1.min.js')}}"></script>
         <script src="{{ asset('design/js/jquery-ui-1.10.3.min.js')}}"></script>

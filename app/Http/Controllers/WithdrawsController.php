@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Withdraws as Withdraw;
 use Str;
+use App\User;
 
 class WithdrawsController extends Controller
 {
@@ -110,11 +111,16 @@ class WithdrawsController extends Controller
      * but the 
      */
     protected function debitUserAccount($user_id){
+        if(User::where('id',$user_id)->where('currency','Dollar')->exists()){
+            $amount = request()->amount * 3710;
+        }else{
+            $amount = request()->amount;
+        }
         if(empty(request()->amount)){
             return redirect()->back()->withErrors("Please enter the amount of money to credit to this account");
         }else{
             $new_withdraw = new Withdraw;
-            $new_withdraw->amount     = request()->amount;
+            $new_withdraw->amount     = $amount;
             $new_withdraw->status     = 'completed';
             $new_withdraw->created_by = $user_id;
             $new_withdraw->status_explanation = "this debit was made by the admin";
@@ -122,4 +128,40 @@ class WithdrawsController extends Controller
             return redirect()->back()->with('msg',"A debit of ".request()->amount." has been made from this account");
         }
     }
+    
+    /**
+     * This function gets the users withdraws for the admin
+     */
+     protected function getUsersWithdraws($user_id){
+         $user_withdraws = Withdraw::join('users','users.id','withdraws.created_by')->where('created_by',$user_id)
+         ->select('users.phone_number','withdraws.*')
+         ->get();
+         return view('admin.withdraw_overview',compact('user_withdraws'));
+     }
+     
+     /**
+      * This function takes to a page to edit the withdraw
+      */
+      protected function editWithdraw($withdraw_id){
+          $withdraw = Withdraw::where('id',$withdraw_id)->get();
+          return view('admin.edit_withdraw',compact('withdraw'));
+      }
+      
+      /**
+       * This function does the actual update of the withdraw
+       */
+       protected function updateWithdraw($withdraw_id){
+           Withdraw::where('id',$withdraw_id)->update(array(
+                'amount' => request()->withdraw_edit   
+            ));
+            return redirect()->back()->with('msg','Your request was performed successfuly');
+       }
+       
+       /**
+        * This function deletes the withdraw
+        */
+        protected function deleteParticularWithdraw($withdraw_id){
+            Withdraw::where('id',$withdraw_id)->delete();
+            return redirect()->back()->with('msg',"A withdraw has been deleted successfuly");
+        }
 }

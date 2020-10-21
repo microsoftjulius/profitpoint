@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Earnings;
 use App\Investments;
 use Carbon\Carbon;
+use Log;
 
 class DailyEarnings extends Command
 {
@@ -56,6 +57,7 @@ class DailyEarnings extends Command
             $new_earnings->sponsor_id = $user_investement->created_by;
             $new_earnings->save();
         }
+        Log::info('Cron Job Started');
         $this->info('You Sucessfully generated an Earning of 2% to every one');
     }
 }

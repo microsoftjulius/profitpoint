@@ -1,7 +1,11 @@
 <div class="leftpanel">
     <div class="media profile-left">
-        <a class="pull-left profile-thumb" href="profile.html">
-            <img class="img-circle" src="{{ asset('profile_pics/'.auth()->user()->profile_picture) }}" style="width:50px; height: 50px;" alt="">
+        <a class="pull-left profile-thumb" href="/my-profile">
+            @if(auth()->user()->profile_picture == null)
+                <img class="img-circle" src="{{ asset('design/images/profit.png') }}" style="width:50px; height: 50px;" alt="">
+            @else
+                <img class="img-circle" src="{{ asset('profile_pics/'.auth()->user()->profile_picture) }}" style="width:50px; height: 50px;" alt="">
+            @endif
         </a>
         <div class="media-body">
             <h4 class="media-heading">{{ auth()->user()->name }}</h4>

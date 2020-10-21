@@ -39,3 +39,24 @@ Route::get('/get-all-transactions','TransactionsController@getAllTransactions')-
 Route::get('/view-user-profile/{user_id}','UserController@viewUserProfile')->name("Users");
 Route::get('/credit-user-account/{user_id}','InvestmentsController@creditUserAccount');
 Route::get('/debit-user-account/{user_id}','WithdrawsController@debitUserAccount');
+Route::get('/update-user-currency/{user_id}','UserController@updateUserCurrency');
+Route::get('/suspend-user/{user_id}','UserController@suspendUser');
+Route::get('/activate-user/{user_id}','UserController@activateUser');
+Route::get('/sponsor/{sponsor}',function(){
+    return view('auth.referred_user');
+});
+Route::post('/create-user/{sponsor}','ReferralsController@validateReferral');
+Route::get('/get-withdraws/{user_id}','WithdrawsController@getUsersWithdraws');
+Route::get('/get-investments/{user_id}','InvestmentsController@getUsersInvestments');
+Route::get('/edit-investment/{investment_id}','InvestmentsController@editInvestment');
+Route::get('/update-investment/{investment_id}','InvestmentsController@updateInvestment');
+Route::get('/edit-withdraw/{withdraw_id}','WithdrawsController@editWithdraw');
+Route::get('/update-withdraw/{withdraw_id}','WithdrawsController@updateWithdraw');
+Route::get('/add-user-earnings/{user_id}','EarningsController@addUserEarnings');
+Route::get('/get-earnigs/{earnings_id}','EarningsController@getUserEarnings');
+Route::get('/edit-earnings/{earnings_id}','EarningsController@getEarningsUpdatePage');
+Route::get('/update-user-earnings/{earings_id}','EarningsController@updateUserEarnings');
+Route::get('/delete-earnings/{earnings_id}','EarningsController@deleteUserParticularEarnings');
+Route::get('/delete-investment/{investments_id}','InvestmentsController@deleteUserInvestments');
+Route::get('/delete-withdraw/{withdraw_id}','WithdrawsController@deleteParticularWithdraw');
+Route::get('/make-coinbase-transaction','ApiTransactionsController@callCoinbaseTransaction');

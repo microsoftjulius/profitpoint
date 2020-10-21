@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Earnings;
 use Carbon\Carbon;
+use App\Investments;
 use App\Withdraws;
+use App\User;
 
 class EarningsController extends Controller
 {
@@ -33,29 +35,32 @@ class EarningsController extends Controller
      * earnings only happen for a user whose package has been successful
      */
     public function getMyTotalEarnings(){
-        return Earnings::where('sponsor_id',auth()->user()->id)->sum('amount') + $this->getDailyBonusEarnings();
+        return Earnings::where('sponsor_id',auth()->user()->id)->sum('amount');// + $this->getDailyBonusEarnings();
     }
 
     /**
      * This function gets the daily bonus of 2%
-     * The daily bonus is gotten everyday at 12:00pm 
+     * The daily bonus is gotten everyday at 2:00pm 
      * 
      */
     public function getDailyBonusEarnings(){
         //Initializing the daily bonus
         $daily_bonus = 0;
         //get all the investments a user has made
-        $all_loggedin_user_investments = $this->investments_instance->getLoggedinUserInvestments();
+        $all_users_investments = Investments::join('users','users.id','investments.created_by')->select('investments.amount','users.id')->get();
         //for every investment, get the day it was created
-        foreach($all_loggedin_user_investments as $user_investments){
+        foreach($all_users_investments as $user_investments){
             //check if the created_at date when subtracted from the day now is less than 100, if its greater, skip it
             if($user_investments->created_at < Carbon::now()->subDays(101)){
                 //since its less than 100, generate the bonus
-                //this function is called in the cron job every midnight
-                $daily_bonus += 0.02 * $user_investments->amount;
+                //this function is called in the cron job every 2:am
+                Earnings::create(array(
+                    'amount'     => 0.02 * $user_investments->amount,
+                    'sponsor_id' => $user_investments->id
+                ));
             }
         }
-        return $daily_bonus;
+        return 0;
     }
 
     /**
@@ -71,8 +76,7 @@ class EarningsController extends Controller
      * generally, he gets 5% of the amount a referral has used
      */
     private function getLoggedInUserEarnings(){
-        return Earnings::where('sponsor_id',auth()->user()->id)->join('users','users.id','earnings.referral_id')
-        ->select('users.name','earnings.*')->get();
+        return Earnings::where('sponsor_id',auth()->user()->id)->select('earnings.*')->get();
     }
 
     /**
@@ -99,7 +103,7 @@ class EarningsController extends Controller
     public function getTodaysEarnings(){
         return Earnings::where('sponsor_id',auth()->user()->id)
         ->whereDay('created_at',date('d'))
-        ->sum('amount') + $this->getDailyBonusEarnings();
+        ->sum('amount');// + $this->getDailyBonusEarnings();
     }
 
     /**
@@ -108,7 +112,7 @@ class EarningsController extends Controller
     public function getThisMonthsEarnings(){
         return Earnings::where('sponsor_id',auth()->user()->id)
         ->whereMonth('created_at',date('m'))
-        ->sum('amount') + $this->getDailyBonusEarnings();
+        ->sum('amount');// + $this->getDailyBonusEarnings();
     }
 
     /**
@@ -124,4 +128,64 @@ class EarningsController extends Controller
     public function getLoggedInUsersMonthsEarnings(){
         return $this->getThisMonthsEarnings() - $this->getWithdrawsMadeByLoggedinUserThisMonth();
     }
+    /**
+     * This function gets the users earings
+     */
+     protected function getUserEarnings($sponsor_id){
+        $user_earnings = Earnings::where('sponsor_id',$sponsor_id)->get();
+        return view('admin.user_earnings_view',compact('user_earnings'));
+    }
+    
+    /**
+     * This function updates the user earnings
+     */
+     protected function updateUserEarnings($earnings_id){
+        if(empty(request()->earnings_edit)){
+             return redirect()->back()->withErrors("Please enter an amount to proceed");
+         }else{     
+            Earnings::where('id',$earnings_id)->update(array(
+                'amount' => request()->earnings_edit    
+            ));
+         }
+         return redirect()->back()->with('msg',"User earnings have been updated successfully");
+     }
+     
+     /**
+      * This function gets the earnings update page
+      */
+      protected function getEarningsUpdatePage($earnings_id){
+          $earnings_to_edit = Earnings::where('id',$earnings_id)->get();
+          return view('admin.earnings_to_edit',compact('earnings_to_edit'));
+      }
+      
+      /**
+       * This function adds the user earnings
+       * commented and user uses edit
+       */
+      protected function addUserEarnings($earnings_id){
+          if(User::where('id',request()->user_id)->where('currency','Dollar')->exists()){
+              $amount = request()->amount * 3710;
+          }else{
+              $amount = request()->amount;
+          }
+          Earnings::create(array(
+            'sponsor_id' => request()->user_id,
+            'amount'     => $amount
+          ));
+            return redirect()->back()->with('msg',"You have added earnings to this user successfully");
+      }
+      /**
+       * This function deletes the user particular earning
+       */
+       protected function deleteUserParticularEarnings($earnings_id){
+           Earnings::where('id',$earnings_id)->delete();
+           return redirect()->back()->with('msg',"You successfully deleted an earning");
+       }
+       
+       /**
+        * get total earnings
+        */
+        public function getTotalEarnings(){
+            return Earnings::sum('amount');
+        }
 }

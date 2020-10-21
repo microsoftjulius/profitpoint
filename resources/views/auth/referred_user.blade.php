@@ -27,10 +27,10 @@
                     <br />
                     <h4 class="text-center mb5">Create a new account</h4>
                     <p class="text-center">Please enter your credentials below</p>
-                    
+                    @include('layouts.messages')
                     <div class="mb30"></div>
                     
-                    <form method="POST" action="{{ route('register') }}">
+                    <form method="POST" action="/create-user/{{request()->route()->sponsor}}">
                         @csrf
 
                         <div class="row">

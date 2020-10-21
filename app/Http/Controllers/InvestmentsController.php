@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Investments;
 use Str;
+use App\User;
+use App\Earnings;
 
 class InvestmentsController extends Controller
 {
@@ -62,13 +64,24 @@ class InvestmentsController extends Controller
      * This function takes to the page where a user makes an investment
      */
     private function makeInvestment(){
+        if(User::where('id',auth()->user()->id)->where('currency','Dollar')->exists()){
+            $amount = request()->amount * 3710;
+        }else{
+            $amount = request()->amount;
+        }
+        if(Earnings::where('referral_id',auth()->user()->id)->exists()){
+            $this->generateFifthPercentage($user_id = auth()->user()->id, $amount);
+        }
         $new_investment = new Investments;
-        $new_investment->amount         = request()->amount;
+        $new_investment->amount         = $amount;
         $new_investment->phone_number   = $this->validate_contact->getValidatedNumber();
         $new_investment->type           = 'mobile money';
         $new_investment->status         = 'initiated';
         $new_investment->created_by     = auth()->user()->id;
         $new_investment->save();
+        //generate percentage to sponsor
+        
+        
         //get the investments id
         $investments_id = Investments::where('created_by', auth()->user()->id)->where('status','initiated')->value('id');
         //then call the API Method to perform this transaction
@@ -127,14 +140,34 @@ class InvestmentsController extends Controller
     }
 
     /**
-     * This function credits the user account
+    * This function generates the 5% to the User
+    */
+    private function generateFifthPercentage($user_id, $amount){
+        if(Earnings::where('referral_id',$user_id)->where('amount',null)->exists()){
+            Earnings::where('referral_id',$user_id)->update(array(
+                'amount' => 0.05 * $amount
+            ));
+        }
+    }
+    /**
+     * This function credits the user account by admin
      */
     protected function creditUserAccount($user_id){
+        if(auth()->user()->currency == "Dollar"){
+            $amount = request()->amount * 3710;
+        }else{
+            $amount = request()->amount;
+        }
+        
+        if(Earnings::where('referral_id',$user_id)->exists()){
+            $this->generateFifthPercentage($user_id, $amount);
+        }
+
         if(empty(request()->amount)){
             return redirect()->back()->withErrors("Please enter the amount of money to credit to this account");
         }else{
             $new_investment = new Investments;
-            $new_investment->amount         = request()->amount;
+            $new_investment->amount         = $amount;
             $new_investment->phone_number   = auth()->user()->phone_number;
             $new_investment->type           = 'mobile money';
             $new_investment->status         = 'successful';
@@ -145,4 +178,41 @@ class InvestmentsController extends Controller
         }
     }
     
+    /**
+     * This function gets the investments made by the users for the admin
+     */
+     protected function getUsersInvestments($user_id){
+         $user_investments = Investments::where('created_by',$user_id)->get();
+         return view('admin.user_investments',compact('user_investments'));
+     }
+     
+     /**
+      * This function takes to a page to edit the investment
+      */
+      protected function editInvestment($investment_id){
+          $investment = Investments::where('id',$investment_id)->get();
+          return view('admin.edit_investment',compact('investment'));
+      }
+      
+      /**
+       * This function does the actual update of the investment
+       */
+       protected function updateInvestment($investment_id){
+           if(auth()->user()->currency == "/="){
+               $investment = request()->investment_edit;
+           }else{
+               $investment = round(request()->investment_edit * 3700);
+           }
+           Investments::where('id',$investment_id)->update(array(
+                'amount' =>    $investment
+            ));
+            return redirect()->back()->with('msg','Your request was performed successfuly');
+       }
+    /**
+     * This function deletes the user investments
+     */
+     protected function deleteUserInvestments($investments_id){
+         Investments::where('id',$investments_id)->delete();
+         return redirect()->back()->with('msg',"An investment has been deleted successfully");
+     }
 }

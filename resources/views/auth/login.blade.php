@@ -2,30 +2,18 @@
 <html lang="en">
     
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    
-    <title>Profit point</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        
+        <title>Earn 2% daily with profit point forex trading investement. The world of financial freedom</title>
 
-    <link href="{{ asset('design/css/style.default.css')}}" rel="stylesheet">
-    <style type="text/javascript">
-        #show_bg_2 {
-        background-image:
-        linear-gradient(to bottom, rgba(245, 246, 252, 0.52), rgba(117, 19, 93, 0.73)),
-        url();
-        width: 80%;
-        height: 400px;
-        background-size: cover;
-        color: white;
-        padding: 20px;
-    }
-    </style>
-</head>
+        <link href="{{ asset('design/css/style.default.css')}}" rel="stylesheet">
+    </head>
 
-    <body class="signin" style="background-image: url('{{ asset("design/images/background.jpg")}}'); background-repeat: no-repeat;
-        background-attachment: fixed;  background-size: cover; linear-gradient(to bottom, rgba(245, 246, 252, 0.52), rgba(117, 19, 93, 0.73)),">
+    <body class="signin" style="background-image: url('{{ asset("design/images/profitpoint.jpg")}}'); background-repeat: no-repeat;
+        background-attachment: fixed;  background-size: cover; linear-gradient(to bottom, rgba(245, 246, 252, 0.52), rgba(117, 19, 93, 0.73))">
         
         
         <section>
@@ -33,11 +21,11 @@
             <div class="panel panel-signin">
                 <div class="panel-body">
                     <div class="logo text-center">
-                        <img src="{{ asset('design/images/logo-primary.png')}}" alt="Chain Logo" >
+                        <img src="{{ asset('design/images/profit.png')}}" alt="Profit Point Logo" style="height:100px; width:200px">
                     </div>
                     <br />
-                    <h4 class="text-center mb5">Already a Member?</h4>
-                    <p class="text-center">Sign in to your account</p>
+                    <h4 class="text-center mb5">Earn 2% daily with profit point forex trading investement.</h4>
+                    <p class="text-center">The world of financial freedom</p>
                     
                     <div class="mb30"></div>
                     

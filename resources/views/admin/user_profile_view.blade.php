@@ -26,18 +26,22 @@
                                             <div><i class="fa fa-envelope"></i> {{ $profile->email }}</div>
                                         
                                             <div class="mb20"></div>
+                                            <form action="/update-user-currency/{{auth()->user()->id}}" method="get">
+                                                <select class="form-control" name="currency">
+                                                    <option></option>
+                                                    <option value="/=">UGX</option>
+                                                    <option value="Dollar">USD</option>
+                                                </select><br>
+                                                <button type="submit" class="btn btn-sm btn-primary">Convert</button>
+                                            </form>
                                         
-                                            <div class="btn-group">
-                                                <button class="btn btn-primary btn-bordered">Referrals</button>
-                                                <button class="btn btn-primary btn-bordered">80</button>
-                                            </div>
+                                            <!--<div class="btn-group">-->
+                                            <!--    <button class="btn btn-primary btn-bordered">Referrals</button>-->
+                                            <!--    <button class="btn btn-primary btn-bordered">80</button>-->
+                                            <!--</div>-->
                                         </div><!-- text-center -->
                                         
                                         <br />
-                                        <h5 class="md-title">Referral Link</h5>
-                                        <ul class="list-unstyled social-list">
-                                            <a href="#">{{ asset('') }}{{ $profile->email }}</a></li>
-                                        </ul>
                                     </div><!-- col-sm-4 col-md-3 -->
                                     
                                     <div class="col-sm-8 col-md-9">
@@ -70,21 +74,43 @@
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="earnings">Total Earnings</label>
-                                                                <input type="text" name="" id="" class="form-control" value="{{ $total_earnings }} {{ $profile->currency }}" readonly>
+                                                                @if($profile->currency == "Dollar")
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ $total_earnings/3710 }}$" readonly>
+                                                                @else
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ $total_earnings }} {{ $profile->currency }}" readonly>
+                                                                @endif
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="withdraws">Withdraws</label>
-                                                                <input type="text" name="" id="" class="form-control" value="{{ $user_total_withdraws }} {{ $profile->currency }}" readonly>
+                                                                @if($profile->currency == "Dollar")
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_withdraws/3710 }}$" readonly>
+                                                                @else
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_withdraws }} {{ $profile->currency }}" readonly>
+                                                                @endif
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="account_balance">Total Investments</label>
-                                                                <input type="text" name="" id="" class="form-control" value="{{ $user_total_investments }} {{ $profile->currency }}" readonly>
+                                                                @if($profile->currency == "Dollar")
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_investments/3710 }}$" readonly>
+                                                                @else
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_investments }} {{ $profile->currency }}" readonly>
+                                                                @endif
+                                                            </div>
+                                                            <div class="col-lg-12">
+                                                                <label>Referral Link</label>
+                                                                <input type="text" value="{{ asset('/sponsor') }}/{{ $profile->email }}" class="form-control" readonly/>
+                                                                <input type="hidden" name='user_id' value="{{ $profile->id }}" />
                                                             </div>
                                                             <div class="row"></div>
                                                             <div class="row">
-                                                                <div class="col-lg-6"><br>
+                                                                <div class="col-lg-12"><br>
                                                                     <button class="btn btn-sm btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm" type="button">Credit Account</button>
                                                                     <button class="btn btn-sm btn-primary" data-toggle="modal" data-target=".bs-example-modal-deb" type="button">Debit Account</button>
+                                                                    <button class="btn btn-sm btn-primary" data-toggle="modal" data-target=".bs-example-modal-number" type="button">Edit Number</button>
+                                                                    <a href="/get-investments/{{ $profile->id }}"><button class="btn btn-sm btn-primary" type="button">Edit Investments</button></a>
+                                                                    <a href="/get-withdraws/{{ $profile->id }}"><button class="btn btn-sm btn-primary" type="button">Edit Withdraws</button></a>
+                                                                    <button class="btn btn-sm btn-primary" data-toggle="modal" data-target=".bs-example-modal-earn" type="button">Add Earnings</button>
+                                                                    <a href="/get-earnigs/{{ $profile->id }}"><button class="btn btn-sm btn-primary" type="button">Edit Earnings</button></a>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -134,6 +160,54 @@
                                                     </div>
                                                     <div class="col-lg-12"><br>
                                                         <button class="btn btn-sm btn-primary" type="submit">Debit Account</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            
+                            <form action="/edit-user-phone-number/{{ $profile->id }}" method="get">
+                                <div class="modal fade bs-example-modal-number" tabindex="-1" role="dialog">
+                                    <div class="modal-dialog modal-sm">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">&times;</button>
+                                                <h4 class="modal-title">Edit User Phone Number</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <label for="current_password">New Number</label>
+                                                        <input type="number" name="phone_number" id="" class="form-control">
+                                                    </div>
+                                                    <div class="col-lg-12"><br>
+                                                        <button class="btn btn-sm btn-primary" type="submit">Confirm</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            
+                            <form action="/add-user-earnings/{{ $profile->id }}" method="get">
+                                <div class="modal fade bs-example-modal-earn" tabindex="-1" role="dialog">
+                                    <div class="modal-dialog modal-sm">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">&times;</button>
+                                                <h4 class="modal-title">Please enter the earnings you want to add to this user</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <label for="current_password">Amount</label>
+                                                        <input type="number" name="amount" id="" class="form-control">
+                                                    </div>
+                                                    <div class="col-lg-12"><br>
+                                                        <button class="btn btn-sm btn-primary" type="submit">Confirm</button>
                                                     </div>
                                                 </div>
                                             </div>

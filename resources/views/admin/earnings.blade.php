@@ -24,7 +24,7 @@
                                 <table id="basicTable" class="table table-striped table-bordered responsive">
                                     <thead class="">
                                         <tr>
-                                            <th>Rerral Name</th>
+                                            <th>Transaction ID</th>
                                             <th>Amount</th>
                                             <th>Time</th>
                                         </tr>
@@ -33,8 +33,12 @@
                                     <tbody>
                                         @foreach ($logged_in_user_earnings as $earnings)
                                             <tr>
-                                                <td>{{ $earnings->name }}</td>
-                                                <td>{{ $earnings->amount }}</td>
+                                                <td></td>
+                                                @if(auth()->user()->currency == "Dollar")
+                                                <td>{{ $earnings->amount/3710 }}$</td>
+                                                @else
+                                                <td>{{ $earnings->amount }} /=</td>
+                                                @endif
                                                 <td>{{ $earnings->created_at }}</td>
                                             </tr>
                                         @endforeach

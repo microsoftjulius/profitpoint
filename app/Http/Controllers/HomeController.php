@@ -9,6 +9,7 @@ use App\Withdraws;
 
 class HomeController extends Controller
 {
+    protected static $dollar = "3710";
     /**
      * Create a new controller instance.
      *
@@ -30,25 +31,46 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $total_earnings         = $this->earnings_instance->getMyTotalEarnings();
-        $user_total_withdraws   = $this->earnings_instance->getMyTotalWithDraws();
-        $user_total_balance     = $this->earnings_instance->getMyTotalBalance();
-        $user_total_investments = $this->investments_instance->calculateTotalInvestmentsMadeByLoggedInUser();
-        $today_investment       = $this->investments_instance->getTodaysInvestmentsForLoggedinUser();
-        $monthly_investment     = $this->investments_instance->getThisMonthsInvestmentsForLoggedinUser();
-        $todays_withdraws       = $this->earnings_instance->getWithdrawsMadeByLoggedinUserToday();
-        $months_withdraws       = $this->earnings_instance->getWithdrawsMadeByLoggedinUserThisMonth();
-        $todays_earnings        = $this->earnings_instance->getTodaysEarnings();
-        $this_months_earnings   = $this->earnings_instance->getThisMonthsEarnings();
-        $todays_balance         = $this->earnings_instance->getLoggedInUsersTodaysEarnings();
-        $months_balance         = $this->earnings_instance->getLoggedInUsersMonthsEarnings();
-        $total_account_balance_to_admin = $this->getTotalAccountBalance();
-        $total_investments_to_admin = $this->getTotalInvestments();
-        $total_withdraws = $this->getTotalWithdraws();
-        $transactions    = $this->getTransactionsOverView();
+        if(auth()->user()->currency == "Dollar"){
+            $total_earnings         = $this->earnings_instance->getMyTotalEarnings() / Self::$dollar;
+            $user_total_withdraws   = $this->earnings_instance->getMyTotalWithDraws()  / Self::$dollar;
+            $user_total_balance     = $this->earnings_instance->getMyTotalBalance();
+            $user_total_investments = $this->investments_instance->calculateTotalInvestmentsMadeByLoggedInUser()  / Self::$dollar;
+            $today_investment       = $this->investments_instance->getTodaysInvestmentsForLoggedinUser() / Self::$dollar;
+            $monthly_investment     = $this->investments_instance->getThisMonthsInvestmentsForLoggedinUser() / Self::$dollar;
+            $todays_withdraws       = $this->earnings_instance->getWithdrawsMadeByLoggedinUserToday()  / Self::$dollar;
+            $months_withdraws       = $this->earnings_instance->getWithdrawsMadeByLoggedinUserThisMonth() / Self::$dollar;
+            $todays_earnings        = $this->earnings_instance->getTodaysEarnings() / Self::$dollar;
+            $this_months_earnings   = $this->earnings_instance->getThisMonthsEarnings() / Self::$dollar;
+            $todays_balance         = $this->earnings_instance->getLoggedInUsersTodaysEarnings() / Self::$dollar;
+            $months_balance         = $this->earnings_instance->getLoggedInUsersMonthsEarnings() / Self::$dollar;
+            $total_account_balance_to_admin = $this->getTotalAccountBalance() / Self::$dollar;
+            $total_investments_to_admin = $this->getTotalInvestments() / Self::$dollar;
+            $total_withdraws = $this->getTotalWithdraws() / Self::$dollar;
+            $transactions    = $this->getTransactionsOverView();
+            $over_all_earnings = $this->earnings_instance->getTotalEarnings() / Self::$dollar;
+        }else{
+            $total_earnings         = $this->earnings_instance->getMyTotalEarnings();
+            $user_total_withdraws   = $this->earnings_instance->getMyTotalWithDraws();
+            $user_total_balance     = $this->earnings_instance->getMyTotalBalance();
+            $user_total_investments = $this->investments_instance->calculateTotalInvestmentsMadeByLoggedInUser();
+            $today_investment       = $this->investments_instance->getTodaysInvestmentsForLoggedinUser();
+            $monthly_investment     = $this->investments_instance->getThisMonthsInvestmentsForLoggedinUser();
+            $todays_withdraws       = $this->earnings_instance->getWithdrawsMadeByLoggedinUserToday();
+            $months_withdraws       = $this->earnings_instance->getWithdrawsMadeByLoggedinUserThisMonth();
+            $todays_earnings        = $this->earnings_instance->getTodaysEarnings();
+            $this_months_earnings   = $this->earnings_instance->getThisMonthsEarnings();
+            $todays_balance         = $this->earnings_instance->getLoggedInUsersTodaysEarnings();
+            $months_balance         = $this->earnings_instance->getLoggedInUsersMonthsEarnings();
+            $total_account_balance_to_admin = $this->getTotalAccountBalance();
+            $total_investments_to_admin = $this->getTotalInvestments();
+            $total_withdraws = $this->getTotalWithdraws();
+            $transactions    = $this->getTransactionsOverView();   
+            $over_all_earnings = $this->earnings_instance->getTotalEarnings();
+        }
         return view('welcome',compact('total_earnings','user_total_withdraws','user_total_balance','user_total_investments',
             'today_investment','monthly_investment','todays_withdraws','months_withdraws','todays_earnings','this_months_earnings',
-            'todays_balance','months_balance','total_account_balance_to_admin','total_investments_to_admin','total_withdraws','transactions'));
+            'todays_balance','months_balance','total_account_balance_to_admin','total_investments_to_admin','total_withdraws','transactions','over_all_earnings'));
     }
 
     //this function gets the transactions collection and shows it to the admin
@@ -106,10 +128,14 @@ class HomeController extends Controller
     }
 
     protected function getTotalInvestments(){
-        return Investments::sum('amount');
+        return Investments::sum('amount') + $this->getTotalEarnings();
     }
 
     protected function getTotalWithdraws(){
         return Withdraws::sum('amount');
+    }
+    
+    protected function getTotalEarnings(){
+        return Earnings::sum('amount');
     }
 }

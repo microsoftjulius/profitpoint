@@ -4,7 +4,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Profit Point</title>
+    <title>Earn 2% daily with profit point forex trading investement. The world of financial freedom</title>
 
     <link href="{{ asset('design/css/style.default.css')}}" rel="stylesheet">
     <link href="{{ asset('design/css/morris.css')}}" rel="stylesheet">

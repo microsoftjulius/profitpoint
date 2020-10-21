@@ -30,7 +30,7 @@
                                     <table id="basicTable" class="table table-striped table-bordered responsive">
                                         <thead class="">
                                             <tr>
-                                                <th>Phone Number</th>
+                                                <th>Phone Number / Bitcoin Address</th>
                                                 <th>Amount</th>
                                                 <th>Time</th>
                                                 {{-- <th>Options</th> --}}
@@ -42,7 +42,7 @@
                                                 @foreach ($transaction_made as $transaction)
                                                 <tr>
                                                     <td>{{ $transaction->phone_number }}</td>
-                                                    <td>{{ $transaction->amount }} /=</td>
+                                                    <td>{{ number_format($transaction->amount) }} /=</td>
                                                     <td>{{ $transaction->created_at }}</td>
                                                     {{-- <td>
                                                         <button class="btn btn-sm btn-primary">view</button>

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Auth;
 use App\User;
+use App\Earnings;
 
 class ProfilesController extends Controller
 {
@@ -24,7 +25,8 @@ class ProfilesController extends Controller
         $user_total_withdraws   = $this->earnings_instance->getMyTotalWithDraws();
         $user_total_balance     = $this->earnings_instance->getMyTotalBalance();
         $user_total_investments = $this->investments_instance->calculateTotalInvestmentsMadeByLoggedInUser();
-        return view('admin.profile',compact('total_earnings','user_total_withdraws','user_total_balance','user_total_investments'));
+        $users_referrals        = $this->getReferralsForLoggedInUser();
+        return view('admin.profile',compact('total_earnings','user_total_withdraws','user_total_balance','user_total_investments','users_referrals'));
     }
 
     /**
@@ -50,7 +52,7 @@ class ProfilesController extends Controller
     }
 
     /**
-     * This function updates the user password
+     * This function updates the user function
      */
     private function updateUserPassword(){
         $new_password = request()->npassword;
@@ -84,4 +86,12 @@ class ProfilesController extends Controller
         ));
         return redirect()->back()->with('msg','Profile picture update was successful');
     }
+    
+    /**
+     * This function gets the referrals for a user
+     */
+     private function getReferralsForLoggedInUser(){
+         $referrals = Earnings::join('users','users.id','earnings.referral_id')->select('users.name','earnings.*','users.status')->where('earnings.sponsor_id',auth()->user()->id)->get();
+         return $referrals;
+     }
 }

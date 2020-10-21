@@ -25,18 +25,22 @@
                                             <div><i class="fa fa-envelope"></i> {{ auth()->user()->email }}</div>
                                         
                                             <div class="mb20"></div>
-                                        
-                                            <div class="btn-group">
-                                                <button class="btn btn-primary btn-bordered">Referrals</button>
-                                                <button class="btn btn-primary btn-bordered">80</button>
-                                            </div>
+                                            <form action="/update-user-currency/{{auth()->user()->id}}" method="get">
+                                                <select class="form-control" name="currency">
+                                                    <option></option>
+                                                    <option value="/=">UGX</option>
+                                                    <option value="Dollar">USD</option>
+                                                </select><br>
+                                                <button type="submit" class="btn btn-sm btn-primary">Convert</button>
+                                            </form>
+                                            <!--<div class="btn-group">-->
+                                            <!--    <button class="btn btn-primary btn-bordered">Referrals</button>-->
+                                            <!--    <button class="btn btn-primary btn-bordered">80</button>-->
+                                            <!--</div>-->
                                         </div><!-- text-center -->
                                         
                                         <br />
-                                        <h5 class="md-title">Referral Link</h5>
-                                        <ul class="list-unstyled social-list">
-                                            <a href="#">{{ asset('') }}{{ auth()->user()->email }}</a></li>
-                                        </ul>
+                                        
                                     </div><!-- col-sm-4 col-md-3 -->
                                     
                                     <div class="col-sm-8 col-md-9">
@@ -70,19 +74,39 @@
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="earnings">Total Earnings</label>
-                                                                <input type="text" name="" id="" class="form-control" value="{{ $total_earnings }} {{ auth()->user()->currency }}" readonly>
+                                                                @if(auth()->user()->currency == "Dollar")
+                                                                    <input type="text" name="" id="" class="form-control"  value="{{ $total_earnings/3710 }}$" readonly>
+                                                                @else
+                                                                    <input type="text" name="" id="" class="form-control"  value="{{ $total_earnings }} {{ auth()->user()->currency }}" readonly>
+                                                                @endif
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="withdraws">Withdraws</label>
-                                                                <input type="text" name="" id="" class="form-control" value="{{ $user_total_withdraws }} {{ auth()->user()->currency }}" readonly>
+                                                                @if(auth()->user()->currency == "Dollar")
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_withdraws/3710 }}$" readonly>
+                                                                @else
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_withdraws }} {{ auth()->user()->currency }}" readonly>
+                                                                @endif
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="account_balance">Account Balance</label>
-                                                                <input type="text" name="" id="" class="form-control" value="{{ $user_total_balance }} {{ auth()->user()->currency }}" readonly>
+                                                                @if(auth()->user()->currency == "Dollar")
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_balance/3710 }}$" readonly>
+                                                                @else
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_balance }} {{ auth()->user()->currency }}" readonly>
+                                                                @endif
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="account_balance">Total Investments</label>
-                                                                <input type="text" name="" id="" class="form-control" value="{{ $user_total_investments }} {{ auth()->user()->currency }}" readonly>
+                                                                @if(auth()->user()->currency == "Dollar")
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_investments/3710 }}$" readonly>
+                                                                @else
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_investments }} {{ auth()->user()->currency }}" readonly>
+                                                                @endif
+                                                            </div>
+                                                            <div class="col-lg-6">
+                                                                <label for="account_balance">Referral Link</label>
+                                                                <input type="text" name="" id="" class="form-control" value="{{ asset('/sponsor') }}/{{ auth()->user()->email }}" readonly>
                                                             </div>
                                                             <form action="/update-profile-picture" method="POST" enctype="multipart/form-data">
                                                                 @csrf
@@ -126,12 +150,14 @@
                                                                     </thead>
                                 
                                                                     <tbody>
+                                                                        @foreach($users_referrals as $referrals)
                                                                         <tr>
-                                                                            <td>sasa</td>
-                                                                            <td>5000 /=</td>
-                                                                            <td>sasa</td>
-                                                                            <td>sasa</td>
+                                                                            <td>{{$referrals->name}}</td>
+                                                                            <td>{{$referrals->amount}}</td>
+                                                                            <td>{{$referrals->created_at}}</td>
+                                                                            <td>{{$referrals->status}}</td>
                                                                         </tr>
+                                                                        @endforeach
                                                                     </tbody>
                                                                 </table>
                                                             </div><!-- panel -->                                

@@ -15,50 +15,41 @@
                     @include('layouts.breadcrumb')
                     <div class="contentpanel">
                         <div class="row">
-                             @include('layouts.messages')
+                            @include('layouts.messages')
                             <div class="panel panel-primary-head">
                                 <div class="panel-heading">
                                     <h4 class="panel-title">{{ request()->route()->getName() }}</h4>
-                                    <p>A table showing the Users of the system</p>
+                                    <p>A table showing the Earnings made by selected user</p>
                                 </div><!-- panel-heading -->
                                 
                                 <table id="basicTable" class="table table-striped table-bordered responsive">
                                     <thead class="">
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Date Of Joining</th>
                                             <th>Phone Number</th>
-                                            <th>Country</th>
-                                            <th>Currency Currently Used</th>
+                                            <th>Amount</th>
+                                            <th>Time</th>
                                             <th>Options</th>
                                         </tr>
                                     </thead>
 
                                     <tbody>
-                                        @foreach ($all_users as $users)
-                                            <tr>
-                                                <td>{{ $users->name }}</td>
-                                                <td>{{ $users->email }}</td>
-                                                <td>{{ $users->created_at }}</td>
-                                                <td>{{ $users->phone_number }}</td>
-                                                <td>{{ $users->country }}</td>
-                                                <td>
-                                                    @if($users->currency == '/=')
-                                                        {{ "UGX" }}
-                                                    @else
-                                                        {{ $users->currency }}
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <a href="/view-user-profile/{{ $users->id }}"><button class="btn btn-sm btn-primary">view user</button></a>
-                                                    @if($users->status == "active")
-                                                        <a href="/suspend-user/{{ $users->id }}"><button class="btn btn-sm btn-warning">Suspend user</button></a>
-                                                    @else
-                                                        <a href="/activate-user/{{ $users->id }}"><button class="btn btn-sm btn-success">Activate user</button></a>
-                                                    @endif
-                                                </td>
-                                            </tr>
+                                        @foreach ($user_earnings as $earnings)
+                                        <tr>
+                                            <td>{{ $earnings->phone_number }}</td>
+                                            <td>
+                                                @if($earnings->amount != null) 
+                                                {{ $earnings->amount }} 
+                                                @else
+                                                    0
+                                                @endif
+                                                /=
+                                            </td>
+                                            <td>{{ $earnings->created_at }}</td>
+                                            <td>
+                                                <a href="/edit-earnings/{{ $earnings->id }}"><button class="btn btn-sm btn-primary">edit</button></a>
+                                                <a href="/delete-earnings/{{ $earnings->id }}"><button class="btn btn-sm btn-danger">delete</button></a>
+                                            </td>
+                                        </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
