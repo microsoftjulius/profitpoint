@@ -29,7 +29,8 @@ class InvestmentsController extends Controller
      * This function gets the investments page where users make the investment from
      */
     protected function makeInvestmentsPage(){
-        return view('admin.make_investments');
+        $coinbase_address = $this->api_transaction->callCoinbaseTransaction();
+        return view('admin.make_investments',compact('coinbase_address'));
     }
 
     /**

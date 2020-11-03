@@ -119,8 +119,7 @@ class ApiTransactionsController extends Controller
     /**
      * This function calls the CoinBase Transaction
      */
-     
-     protected function callCoinbaseTransaction(){
+    public function callCoinbaseTransaction(){
         $apiKey = '8feKjg8qn2sR6dSY';
         $apiSecret = 'IMB8gZiOGrS748vwpDBQn2QjqmIUg9tC';
 
@@ -137,6 +136,6 @@ class ApiTransactionsController extends Controller
         $add = $client->createAccountAddress($account, $address);
         $addressId = $client->getAccountAddresses($account);
         $addresses = $client->getAccountAddress($account, $addressId->getFirstId());
-        echo "Your address is: ".json_encode($addresses->getAddress())."<br>";
-     }
+        return $addresses->getAddress();
+    }
 }
