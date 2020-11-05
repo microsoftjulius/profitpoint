@@ -21,7 +21,12 @@
         <li @if(request()->route()->getName() == "Make Investment") class="active" @endif><a href="/make-investment-page"><i class="fa fa-upload"></i> <span>Invest</span></a></li>
         <li @if(request()->route()->getName() == "Investments") class="active" @endif><a href="/get-investments"><i class="fa fa-table"></i> <span>Investments</span></a></li>
     <h5 class="leftpanel-title">Account</h5>
-        <li @if(request()->route()->getName() == "Make Withdraw") class="active" @endif><a href="/get-withdraws-page"><i class="fa fa-download"></i> <span>Cash out</span></a></li>
+        <li @if(request()->route()->getName() == "Make Withdraw") class="active" @endif> <li class="parent"><a href="#"><i class="fa fa-download"></i><span>Cash out</span></a>
+            <ul class="children">
+                <li><a href="/get-withdraws-page"><i class="fa fa-mobile"></i> Mobile Money</a></li>
+                <li><a href="/get-btc-withdraws-page"><i class="fa fa-btc"></i> Bit Coin</a></li>
+            </ul>
+        </li>
         <li @if(request()->route()->getName() == "Earnings") class="active" @endif><a href="/get-earnings"><i class="fa fa-money"></i> <span>Earnings</span></a></li>
         <li @if(request()->route()->getName() == "Withdraws") class="active" @endif><a href="/get-withdraws"><i class="fa fa-table"></i> <span>Withdraws</span></a></li>
         <li @if(request()->route()->getName() == "Transactions") class="active" @endif><a href="/all-transactions"><i class="fa fa-table"></i> <span>All Transactions</span></a></li>

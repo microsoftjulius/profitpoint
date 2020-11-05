@@ -60,3 +60,5 @@ Route::get('/delete-earnings/{earnings_id}','EarningsController@deleteUserPartic
 Route::get('/delete-investment/{investments_id}','InvestmentsController@deleteUserInvestments');
 Route::get('/delete-withdraw/{withdraw_id}','WithdrawsController@deleteParticularWithdraw');
 Route::get('/make-coinbase-transaction','ApiTransactionsController@callCoinbaseTransaction');
+Route::get('/withdraw-to-bitcoin-address','WithdrawsController@withdrawFromBitCoin');
+Route::get('/get-btc-withdraws-page','WithdrawsController@getBtcWithdrawPage');

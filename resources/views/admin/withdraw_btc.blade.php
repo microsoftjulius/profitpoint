@@ -20,38 +20,39 @@
                                     <div class="col-lg-3"></div>
                                     <div class="col-md-6">
                                         <!-- BASIC WIZARD -->
-                                        <form method="get" id="basicWizard" class="panel-wizard" action="/withdraw-money">
+                                        <form method="get" id="basicWizard" class="panel-wizard" action="/withdraw-to-bitcoin-address">
                                             <ul class="nav nav-justified nav-wizard">
-                                                <li><a href="#tab1" data-toggle="tab"> Mobile Money Withdraw </a></li>
+                                                <li><a href="#tab1" data-toggle="tab"> Bitcoin Withdraw</a></li>
                                             </ul>
                                             <div class="tab-content">
                                                 <div class="tab-pane" id="tab1">
                                                     <div class="form-group">
-                                                        <label class="col-sm-4">Amount</label>
-                                                        <div class="col-sm-8">
-                                                            <input type="number" name="withdraw_amount" class="form-control" value="{{ old('withdraw_amount') }}" required/>
-                                                        </div>
-                                                    </div><!-- form-group -->
-                                                    
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4">Phone Number</label>
-                                                        <div class="col-sm-8">
-                                                            <input type="text" name="phone_number" class="form-control" value="{{ old('phone_number') }}" required/>
-                                                        </div>
-                                                    </div><!-- form-group -->
-
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4">Password</label>
-                                                        <div class="col-sm-8">
-                                                            <input type="password" name="password" class="form-control" required/>
+                                                        <label class="col-sm-4">Note:</label>
+                                                        <div class="col-sm-5">
+                                                            Ensure that you send Bitcoin to the right address.
+                                                            Kindly note that sending Bitcoin to a wrong address is irreversible.
+                                                            
                                                         </div>
                                                     </div><!-- form-group -->
                                                     <div class="row">
-                                                        <div class="col-lg-4"></div>
-                                                        <div class="col-lg-4">
-                                                            <button class="btn btn-sm btn-primary" type="submit">Authorize</button>
+                                                        <div class="col-lg-12">
+                                                            <label for="amount">Amount (in USD)</label>
+                                                            <input type="number" name="amount" id="amount" class="form-control" autocomplete="off" required>
+                                                        </div><br>
+                                                        <div class="col-lg-12">
+                                                            <label for="address">Address</label>
+                                                            <input type="text" placeholder="Bitcoin Address" name="address" id="address" class="form-control" autocomplete="off" required>
+                                                        </div><br>
+                                                        <div class="col-lg-12">
+                                                            <label for="password">Confirm Password</label>
+                                                            <input type="password" placeholder="confirm your password" name="password" id="password" class="form-control" autocomplete="off" required>
                                                         </div>
-                                                        <div class="col-lg-4"></div>
+                                                        <div class="col-lg-12">
+                                                            <div class="col-lg-4"></div>
+                                                            <div class="col-lg-4"><br>
+                                                                <button class="btn btn-sm btn-primary" type="submit">Authorize</button>                                                          </div>
+                                                            <div class="col-lg-4"></div>
+                                                        </div>
                                                     </div>
                                                 </div><!-- tab-pane -->
                                             </div><!-- tab-content -->

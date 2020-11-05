@@ -132,36 +132,106 @@ class WithdrawsController extends Controller
     /**
      * This function gets the users withdraws for the admin
      */
-     protected function getUsersWithdraws($user_id){
-         $user_withdraws = Withdraw::join('users','users.id','withdraws.created_by')->where('created_by',$user_id)
-         ->select('users.phone_number','withdraws.*')
-         ->get();
-         return view('admin.withdraw_overview',compact('user_withdraws'));
-     }
-     
-     /**
-      * This function takes to a page to edit the withdraw
-      */
-      protected function editWithdraw($withdraw_id){
-          $withdraw = Withdraw::where('id',$withdraw_id)->get();
-          return view('admin.edit_withdraw',compact('withdraw'));
-      }
-      
-      /**
-       * This function does the actual update of the withdraw
-       */
-       protected function updateWithdraw($withdraw_id){
-           Withdraw::where('id',$withdraw_id)->update(array(
-                'amount' => request()->withdraw_edit   
-            ));
-            return redirect()->back()->with('msg','Your request was performed successfuly');
-       }
-       
-       /**
-        * This function deletes the withdraw
-        */
-        protected function deleteParticularWithdraw($withdraw_id){
-            Withdraw::where('id',$withdraw_id)->delete();
-            return redirect()->back()->with('msg',"A withdraw has been deleted successfuly");
+    protected function getUsersWithdraws($user_id){
+        $user_withdraws = Withdraw::join('users','users.id','withdraws.created_by')->where('created_by',$user_id)
+        ->select('users.phone_number','withdraws.*')
+        ->get();
+        return view('admin.withdraw_overview',compact('user_withdraws'));
+    }
+    
+    /**
+     * This function takes to a page to edit the withdraw
+    */
+    protected function editWithdraw($withdraw_id){
+        $withdraw = Withdraw::where('id',$withdraw_id)->get();
+        return view('admin.edit_withdraw',compact('withdraw'));
+    }
+    
+    /**
+     * This function does the actual update of the withdraw
+     */
+    protected function updateWithdraw($withdraw_id){
+        Withdraw::where('id',$withdraw_id)->update(array(
+            'amount' => request()->withdraw_edit   
+        ));
+        return redirect()->back()->with('msg','Your request was performed successfuly');
+    }
+    
+    /**
+    * This function deletes the withdraw
+    */
+    protected function deleteParticularWithdraw($withdraw_id){
+        Withdraw::where('id',$withdraw_id)->delete();
+        return redirect()->back()->with('msg',"A withdraw has been deleted successfuly");
+    }
+
+    /**
+     * This function makes a withdraw from the bitcoin address
+     */
+    protected function withdrawFromBitCoin(){
+        if(empty(request()->amount)){
+            return redirect()->back()->withErrors("Please enter the amount of money you want to withdraw to proceed");
+        }elseif(empty(request()->address)){
+            return redirect()->back()->withErrors("Please enter the bitcoin address which you want to withdraw this money to");
+        }elseif(empty(request()->password)){
+            return redirect()->back()->withErrors("Please enter your password to confirm");
+        }elseif(!ctype_digit(request()->amount)){
+            return redirect()->back()->withInput()->withErrors("Please enter a valid amount of money to proceed, money should completely be interger eg, 500000 for 500,000");
+        }elseif(request()->amount > $this->earnings_instance->getMyTotalBalance()){
+            return redirect()->back()->withInput()->withErrors("You have insufficient balance to make this transaction");
+        }elseif(request()->amount < Self::$minimum_amount_to_withdraw){
+            return redirect()->back()->withInput()->withErrors("Please request a withdraw that is equal or greater than ". Self::$minimum_amount_to_withdraw);
+        }elseif(request()->amount > Self::$maximum_amount_to_withdraw){
+            return redirect()->back()->withInput()->withErrors("Please request a withdraw that is equal or less than ". Self::$maximum_amount_to_withdraw);
+        }elseif(Withdraw::where('created_by',auth()->user()->id)->where('transaction_id',null)->where('status','pending')->exists()){
+            return redirect()->back()->withInput()->withErrors("You will ba able to request a next withdraw in the next 30 minutes or when the previous withdraw request you performed is successful");
+        }elseif(Hash::check(request()->password, User::find(auth()->user()->id)->password)){
+            return $this->makeBtcWithdraw();
+        }else{
+            return redirect()->back()->withErrors("You entered a wrong password, Kindly provide a right password to proceed");
         }
+    }
+
+    /**
+     * This function saves the btc withdraw
+     */
+    protected function makeBtcWithdraw(){
+        $new_btc_withdraw = new Withdraw;
+        $new_btc_withdraw->amount = request()->amount;
+        $new_btc_withdraw->btc_address = request()->address;
+        $new_btc_withdraw->created_by = auth()->user()->id;
+        $new_btc_withdraw->status = 'pending';
+        $new_btc_withdraw->save();
+        $this->api_transaction->makeBitCoinTransaction((auth()->user()->address), request()->amount);
+        return redirect()->back()->with('msg','A withdraw transaction request to btc address '. request()->address .' of amount '. request()->amount.' has been processed successfully');
+    }
+
+    /**
+     * This function withdraws money from a user account by the Admin for bitcoin
+     * but the 
+     */
+    protected function debitUserAccountBtc($user_id){
+        if(User::where('id',$user_id)->where('currency','Dollar')->exists()){
+            $amount = request()->amount * 3710;
+        }else{
+            $amount = request()->amount;
+        }
+        if(empty(request()->amount)){
+            return redirect()->back()->withErrors("Please enter the amount of money to credit to this account");
+        }else{
+            $new_withdraw = new Withdraw;
+            $new_withdraw->amount     = $amount;
+            $new_withdraw->status     = 'completed';
+            $new_withdraw->created_by = $user_id;
+            $new_withdraw->status_explanation = "this debit was made by the admin";
+            $new_withdraw->save();
+            return redirect()->back()->with('msg',"A debit of ".request()->amount." has been made from this account");
+        }
+    }
+    /**
+     * This function gets the withdraws page of btc
+     */
+    protected function getBtcWithdrawPage(){
+        return view('admin.withdraw_btc');
+    }
 }

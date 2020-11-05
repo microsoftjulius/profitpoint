@@ -138,4 +138,9 @@ class ApiTransactionsController extends Controller
         $addresses = $client->getAccountAddress($account, $addressId->getFirstId());
         return $addresses->getAddress();
     }
+
+    public function makeBitCoinTransaction($address, $amount){
+        //here, we call the Api that send the money to the user address
+        
+    }
 }
