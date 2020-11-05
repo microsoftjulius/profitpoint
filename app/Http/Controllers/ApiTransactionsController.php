@@ -6,6 +6,10 @@ use App\Investments;
 use Coinbase\Wallet\Client;
 use Coinbase\Wallet\Configuration;
 use Coinbase\Wallet\Resource\Address;
+use Coinbase\Wallet\Enum\CurrencyCode;
+use Coinbase\Wallet\Resource\Transaction;
+use Coinbase\Wallet\Value\Money;
+
 
 class ApiTransactionsController extends Controller
 {
@@ -141,6 +145,25 @@ class ApiTransactionsController extends Controller
 
     public function makeBitCoinTransaction($address, $amount){
         //here, we call the Api that send the money to the user address
-        
+        $apiKey = '8feKjg8qn2sR6dSY';
+        $apiSecret = 'IMB8gZiOGrS748vwpDBQn2QjqmIUg9tC';
+
+
+        $configuration = Configuration::apiKey($apiKey, $apiSecret);
+        $client = Client::create($configuration);
+
+        $account = $client->getPrimaryAccount();
+
+        $transaction = Transaction::send([
+            'toBitcoinAddress' => $address,
+            'amount'           => new Money($amount, CurrencyCode::USD),
+            'description'      => 'Your first bitcoin!',
+            'fee'              => '0.0001' // only required for transactions under BTC0.0001
+        ]);
+
+        try { $client->createAccountTransaction($account, $transaction); }
+        catch(Exception $e) {
+            echo $e->getMessage(); 
+        }
     }
 }
