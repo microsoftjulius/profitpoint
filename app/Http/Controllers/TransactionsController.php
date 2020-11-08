@@ -11,6 +11,7 @@ class TransactionsController extends Controller
         $this->middleware('auth');
         $this->withdraws_instance = new WithdrawsController;
         $this->investments_instance = new InvestmentsController;
+        $this->dollar_rates_instance  = new DollarRatesController;
     }
 
     /**
@@ -20,7 +21,8 @@ class TransactionsController extends Controller
         $my_withdraws = $this->withdraws_instance->getLoggedInUsersWithdrawsCollection();
         $my_deposits  = $this->investments_instance->getLoggedinUserInvestments();
         $transactions = collect([$my_deposits, $my_withdraws]);
-        return view('admin.transaction',compact('transactions'));
+        $dollar_rate = $this->dollar_rates_instance->getDollarRate();
+        return view('admin.transaction',compact('transactions','dollar_rate'));
     }
 
     /**
@@ -30,6 +32,7 @@ class TransactionsController extends Controller
         $all_withdraws = $this->withdraws_instance->getAllWithdrawsToAdmin();
         $all_deposits  = $this->investments_instance->getLoggedinUserInvestments();
         $transactions = collect([$all_deposits, $all_withdraws]);
-        return view('admin.transaction_overview',compact('transactions'));
+        $dollar_rate = $this->dollar_rates_instance->getDollarRate();
+        return view('admin.transaction_overview',compact('transactions','dollar_rate'));
     }
 }

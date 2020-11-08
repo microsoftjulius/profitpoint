@@ -38,6 +38,9 @@ class UserController extends Controller
      * This function updates the currency of the User to Dollar or Ugx
      */
     protected function updateUserCurrency($id){
+        if(empty(request()->currency)){
+            return redirect()->back()->withErrors('Please select a currency you want to convert to to proceed');
+        }
         User::where('id',$id)->update(array(
             'currency' => request()->currency
         ));

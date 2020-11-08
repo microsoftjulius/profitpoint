@@ -35,7 +35,14 @@
                                         @foreach ($all_investments as $earnings)
                                             <tr>
                                                 <td>{{ $earnings->name }}</td>
-                                                <td>{{ number_format($earnings->amount) }}{{ auth()->user()->currency }}</td>
+                                                <td>
+                                                    @if($earnings->currency == "Dollar")
+                                                        {{ number_format($earnings->amount) }}
+                                                    @else
+                                                        {{ number_format($earnings->amount * $dollar_rate) }}
+                                                    @endif
+                                                        {{ $earnings->currency }}
+                                                </td>
                                                 <td>{{ $earnings->created_at }}</td>
                                                 <td>{{ $earnings->status }}</td>
                                             </tr>

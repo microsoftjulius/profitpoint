@@ -36,7 +36,13 @@
                                         @foreach ($user_investments as $investment)
                                         <tr>
                                             <td>{{ $investment->phone_number }}</td>
-                                            <td>{{ $investment->amount }} /=</td>
+                                            <td>
+                                                @if(auth()->user()->currency == "Dollar")
+                                                    {{ number_format($investment->amount) }}$
+                                                @else
+                                                    {{ number_format($investment->amount * $dollar_rate) }} Ugx
+                                                @endif
+                                            </td>
                                             <td>{{ $investment->created_at }}</td>
                                             <td>{{ $investment->status }}</td>
                                             <td>

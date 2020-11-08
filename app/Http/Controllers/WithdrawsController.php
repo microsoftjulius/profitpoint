@@ -79,7 +79,8 @@ class WithdrawsController extends Controller
         $new_withdraw->created_by = auth()->user()->id;
         $new_withdraw->save();
         //then call the function to perfom a withdraw transaction
-        $this->api_transaction->withdrawMoneyFromJpesa(Str::substr(auth()->user()->phone_number,1,12), $amount * $this->dollar_rates_instance->getDollarRate());
+        //reduce 1000 from the withdraw
+        $this->api_transaction->withdrawMoneyFromJpesa(Str::substr(auth()->user()->phone_number,1,12), (($amount * $this->dollar_rates_instance->getDollarRate())-1000));
         return redirect()->back()->with('msg','A withdraw transaction request has been processed successfully');
     }
 
@@ -143,9 +144,10 @@ class WithdrawsController extends Controller
      */
     protected function getUsersWithdraws($user_id){
         $user_withdraws = Withdraw::join('users','users.id','withdraws.created_by')->where('created_by',$user_id)
-        ->select('users.phone_number','withdraws.*')
+        ->select('users.phone_number','users.currency','withdraws.*')
         ->get();
-        return view('admin.withdraw_overview',compact('user_withdraws'));
+        $dollar_rate = $this->dollar_rates_instance->getDollarRate();
+        return view('admin.withdraw_overview',compact('user_withdraws','dollar_rate'));
     }
     
     /**
@@ -214,7 +216,8 @@ class WithdrawsController extends Controller
         $new_btc_withdraw->status = 'pending';
         $new_btc_withdraw->save();
         $this->api_transaction->makeBitCoinTransaction((auth()->user()->address), $amount);
-        return redirect()->back()->with('msg','A withdraw transaction request to btc address '. request()->address .' of amount '. request()->amount.' has been processed successfully');
+        return redirect()->back()->with('msg','A withdraw transaction request to btc address '. request()->address .' of amount '. 
+            ($amount - 1000/$this->dollar_rates_instance->getDollarRate()).' has been processed successfully');
     }
 
     /**

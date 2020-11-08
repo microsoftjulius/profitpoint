@@ -36,7 +36,14 @@
                                         @foreach ($user_withdraws as $user_collection)
                                         <tr>
                                             <td>{{ $user_collection->phone_number }}</td>
-                                            <td>{{ $user_collection->amount }} /=</td>
+                                            <td>
+                                                @if($user_collection->currency == "Dollar")
+                                                    {{ number_format($user_collection->amount) }}
+                                                @else
+                                                    {{ number_format($user_collection->amount * $dollar_rate) }}
+                                                @endif
+                                                    {{ $user_collection->currency }}
+                                            </td>
                                             <td>{{ $user_collection->created_at }}</td>
                                             <td>
                                                 <a href='/edit-withdraw/{{$user_collection->id}}'><button class="btn btn-sm btn-primary">edit</button></a>

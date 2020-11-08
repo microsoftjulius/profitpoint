@@ -42,7 +42,14 @@
                                                 @foreach ($transaction_made as $transaction)
                                                 <tr>
                                                     <td>{{ $transaction->phone_number }}</td>
-                                                    <td>{{ number_format($transaction->amount) }} /=</td>
+                                                    <td>
+                                                        @if(auth()->user()->currency == "Dollar")
+                                                            {{ number_format($transaction->amount) }}
+                                                        @else
+                                                            {{ number_format($transaction->amount * $dollar_rate) }}
+                                                        @endif
+                                                            {{ auth()->user()->currency }}
+                                                    </td>
                                                     <td>{{ $transaction->created_at }}</td>
                                                     {{-- <td>
                                                         <button class="btn btn-sm btn-primary">view</button>

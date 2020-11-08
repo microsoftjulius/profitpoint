@@ -36,7 +36,13 @@
                                             @foreach ($transaction_made as $transaction)
                                             <tr>
                                                 <td>{{ $transaction->phone_number }}</td>
-                                                <td>{{ $transaction->amount }} /=</td>
+                                                <td>
+                                                    @if($transaction->currency == "Dollar")
+                                                        {{ number_format($transaction->amount) }}$
+                                                    @else
+                                                        {{ number_format($transaction->amount * $dollar_rate) }}Ugx
+                                                    @endif
+                                                </td>
                                                 <td>{{ $transaction->created_at }}</td>
                                                 <td>
                                                     <button class="btn btn-sm btn-primary">view</button>

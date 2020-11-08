@@ -130,7 +130,8 @@ class InvestmentsController extends Controller
      */
     protected function getAllInvestments(){
         $all_investments = $this->getInvestmentsToAdmin();
-        return view('admin.investments_overview',compact('all_investments'));
+        $dollar_rate = $this->dollar_rates_instance->getDollarRate();
+        return view('admin.investments_overview',compact('all_investments','dollar_rate'));
     }
 
     /**

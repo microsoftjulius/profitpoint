@@ -68,9 +68,10 @@ class HomeController extends Controller
             $transactions    = $this->getTransactionsOverView();   
             $over_all_earnings = $this->earnings_instance->getTotalEarnings();
         }
+        $dollar_rate = $this->dollar_rates_instance->getDollarRate();
         return view('welcome',compact('total_earnings','user_total_withdraws','user_total_balance','user_total_investments',
             'today_investment','monthly_investment','todays_withdraws','months_withdraws','todays_earnings','this_months_earnings',
-            'todays_balance','months_balance','total_account_balance_to_admin','total_investments_to_admin','total_withdraws','transactions','over_all_earnings'));
+            'todays_balance','months_balance','total_account_balance_to_admin','total_investments_to_admin','total_withdraws','transactions','over_all_earnings','dollar_rate'));
     }
 
     //this function gets the transactions collection and shows it to the admin
