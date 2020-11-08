@@ -10,5 +10,4 @@ class AccountsController extends Controller
     {
         $this->middleware('auth');
     }
-
 }

@@ -74,35 +74,19 @@
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="earnings">Total Earnings</label>
-                                                                @if(auth()->user()->currency == "Dollar")
-                                                                    <input type="text" name="" id="" class="form-control"  value="{{ $total_earnings/3710 }}$" readonly>
-                                                                @else
-                                                                    <input type="text" name="" id="" class="form-control"  value="{{ $total_earnings }} {{ auth()->user()->currency }}" readonly>
-                                                                @endif
+                                                                    <input type="text" name="" id="" class="form-control"  value="{{ number_format($total_earnings) }} {{ auth()->user()->currency }}" readonly>
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="withdraws">Withdraws</label>
-                                                                @if(auth()->user()->currency == "Dollar")
-                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_withdraws/3710 }}$" readonly>
-                                                                @else
-                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_withdraws }} {{ auth()->user()->currency }}" readonly>
-                                                                @endif
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ number_format($user_total_withdraws) }} {{ auth()->user()->currency }}" readonly>
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="account_balance">Account Balance</label>
-                                                                @if(auth()->user()->currency == "Dollar")
-                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_balance/3710 }}$" readonly>
-                                                                @else
-                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_balance }} {{ auth()->user()->currency }}" readonly>
-                                                                @endif
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ number_format($user_total_balance) }} {{ auth()->user()->currency }}" readonly>
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="account_balance">Total Investments</label>
-                                                                @if(auth()->user()->currency == "Dollar")
-                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_investments/3710 }}$" readonly>
-                                                                @else
-                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_investments }} {{ auth()->user()->currency }}" readonly>
-                                                                @endif
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ number_format($user_total_investments) }} {{ auth()->user()->currency }}" readonly>
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="account_balance">Referral Link</label>

@@ -28,28 +28,28 @@ class ReferralsController extends Controller
             return $this->createReferral($sponsor_email);
         }
     }
-      /**
-       * This function creates a referral for a user
-       */
-       protected function createReferral($sponsor_email){
-           if(User::where('email',request()->email)->exists()){
-               return redirect()->back()->withErrors("This email was already taken, kindly use another email");
-           }
-            User::create([
-                'name'         => request()->name,
-                'email'        => request()->email,
-                'password'     => Hash::make(request()->password),
-                'country'      => request()->country,
-                'phone_number' => request()->phone_number
-            ]);
-            
-            $refferal_id = User::where('email',request()->email)->value('id');
-            $sponsor_id = User::where('email',$sponsor_email)->value('id');
-            
-            Earnings::create(array(
-                'sponsor_id'   => $sponsor_id,
-                'referral_id'  => $refferal_id
-            ));
-            return redirect('/overview');
-       }
+    /**
+     * This function creates a referral for a user
+     */
+    protected function createReferral($sponsor_email){
+        if(User::where('email',request()->email)->exists()){
+            return redirect()->back()->withErrors("This email was already taken, kindly use another email");
+        }
+        User::create([
+            'name'         => request()->name,
+            'email'        => request()->email,
+            'password'     => Hash::make(request()->password),
+            'country'      => request()->country,
+            'phone_number' => request()->phone_number
+        ]);
+        
+        $refferal_id = User::where('email',request()->email)->value('id');
+        $sponsor_id = User::where('email',$sponsor_email)->value('id');
+        
+        Earnings::create(array(
+            'sponsor_id'   => $sponsor_id,
+            'referral_id'  => $refferal_id
+        ));
+        return redirect('/overview');
+    }
 }

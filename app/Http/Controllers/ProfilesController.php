@@ -15,17 +15,25 @@ class ProfilesController extends Controller
         $this->middleware('auth');
         $this->earnings_instance    = new EarningsController;
         $this->investments_instance = new InvestmentsController;
+        $this->dollar_rates_instance = new DollarRatesController;
     }
 
     /**
      * This function gets the user profile
      */
     protected function getUserProfile(){
-        $total_earnings         = $this->earnings_instance->getMyTotalEarnings();
-        $user_total_withdraws   = $this->earnings_instance->getMyTotalWithDraws();
-        $user_total_balance     = $this->earnings_instance->getMyTotalBalance();
-        $user_total_investments = $this->investments_instance->calculateTotalInvestmentsMadeByLoggedInUser();
-        $users_referrals        = $this->getReferralsForLoggedInUser();
+        if(auth()->user()->currency == "/="){
+            $total_earnings         = $this->earnings_instance->getMyTotalEarnings() * $this->dollar_rates_instance->getDollarRate();
+            $user_total_withdraws   = $this->earnings_instance->getMyTotalWithDraws() * $this->dollar_rates_instance->getDollarRate();
+            $user_total_balance     = $this->earnings_instance->getMyTotalBalance() * $this->dollar_rates_instance->getDollarRate();
+            $user_total_investments = $this->investments_instance->calculateTotalInvestmentsMadeByLoggedInUser() * $this->dollar_rates_instance->getDollarRate();
+        }else{
+            $total_earnings         = $this->earnings_instance->getMyTotalEarnings();
+            $user_total_withdraws   = $this->earnings_instance->getMyTotalWithDraws();
+            $user_total_balance     = $this->earnings_instance->getMyTotalBalance();
+            $user_total_investments = $this->investments_instance->calculateTotalInvestmentsMadeByLoggedInUser();
+        }
+        $users_referrals  = $this->getReferralsForLoggedInUser();
         return view('admin.profile',compact('total_earnings','user_total_withdraws','user_total_balance','user_total_investments','users_referrals'));
     }
 
@@ -90,8 +98,8 @@ class ProfilesController extends Controller
     /**
      * This function gets the referrals for a user
      */
-     private function getReferralsForLoggedInUser(){
-         $referrals = Earnings::join('users','users.id','earnings.referral_id')->select('users.name','earnings.*','users.status')->where('earnings.sponsor_id',auth()->user()->id)->get();
-         return $referrals;
-     }
+    private function getReferralsForLoggedInUser(){
+        $referrals = Earnings::join('users','users.id','earnings.referral_id')->select('users.name','earnings.*','users.status')->where('earnings.sponsor_id',auth()->user()->id)->get();
+        return $referrals;
+    }
 }

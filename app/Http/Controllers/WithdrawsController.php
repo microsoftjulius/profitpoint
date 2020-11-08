@@ -19,6 +19,7 @@ class WithdrawsController extends Controller
         $this->earnings_instance      = new EarningsController;
         $this->api_transaction        = new ApiTransactionsController;
         $this->validate_contact       = new ValidNumbersController;
+        $this->dollar_rates_instance  = new DollarRatesController;
     }
     /**
      * This function takes to the withdraws page
@@ -70,13 +71,15 @@ class WithdrawsController extends Controller
      * method to performthe withdraw
      */
     private function saveWithdrawRequest(){
+        $amount = auth()->user()->currency == "Dollar" ? request()->withdraw_amount : request()->withdraw_amount / $this->dollar_rates_instance->getDollarRate();
+
         $new_withdraw = new Withdraw;
-        $new_withdraw->amount = request()->withdraw_amount;
+        $new_withdraw->amount = $amount;
         $new_withdraw->status = 'pending';
         $new_withdraw->created_by = auth()->user()->id;
         $new_withdraw->save();
         //then call the function to perfom a withdraw transaction
-        $this->api_transaction->withdrawMoneyFromJpesa(Str::substr(auth()->user()->phone_number,1,12), request()->withdraw_amount);
+        $this->api_transaction->withdrawMoneyFromJpesa(Str::substr(auth()->user()->phone_number,1,12), $amount * $this->dollar_rates_instance->getDollarRate());
         return redirect()->back()->with('msg','A withdraw transaction request has been processed successfully');
     }
 
@@ -108,13 +111,14 @@ class WithdrawsController extends Controller
 
     /**
      * This function withdraws money from a user account by the Admin
-     * but the 
+     * but the amount entered is dependent on the user currency
      */
     protected function debitUserAccount($user_id){
         if(User::where('id',$user_id)->where('currency','Dollar')->exists()){
-            $amount = request()->amount * 3710;
-        }else{
             $amount = request()->amount;
+        }else{
+            //convert the amount to dollar for it to be saved
+            $amount = request()->amount / $this->dollar_rates_instance->getDollarRate();
         }
         if(empty(request()->amount)){
             return redirect()->back()->withErrors("Please enter the amount of money to credit to this account");
@@ -125,7 +129,12 @@ class WithdrawsController extends Controller
             $new_withdraw->created_by = $user_id;
             $new_withdraw->status_explanation = "this debit was made by the admin";
             $new_withdraw->save();
-            return redirect()->back()->with('msg',"A debit of ".request()->amount." has been made from this account");
+
+            $user_currency = User::where('id',$user_id)->value('currency');
+            if($user_currency == '/='){
+                $user_currency = "Uganda Shillings";
+            }
+            return redirect()->back()->with('msg',"A debit of ".request()->amount ." ". $user_currency ." has been made from this account");
         }
     }
     
@@ -196,13 +205,15 @@ class WithdrawsController extends Controller
      * This function saves the btc withdraw
      */
     protected function makeBtcWithdraw(){
+        $amount = auth()->user()->currency == "Dollar" ? request()->withdraw_amount : request()->withdraw_amount / $this->dollar_rates_instance->getDollarRate();
+
         $new_btc_withdraw = new Withdraw;
-        $new_btc_withdraw->amount = request()->amount;
+        $new_btc_withdraw->amount = $amount;
         $new_btc_withdraw->btc_address = request()->address;
         $new_btc_withdraw->created_by = auth()->user()->id;
         $new_btc_withdraw->status = 'pending';
         $new_btc_withdraw->save();
-        $this->api_transaction->makeBitCoinTransaction((auth()->user()->address), request()->amount);
+        $this->api_transaction->makeBitCoinTransaction((auth()->user()->address), $amount);
         return redirect()->back()->with('msg','A withdraw transaction request to btc address '. request()->address .' of amount '. request()->amount.' has been processed successfully');
     }
 
@@ -212,9 +223,9 @@ class WithdrawsController extends Controller
      */
     protected function debitUserAccountBtc($user_id){
         if(User::where('id',$user_id)->where('currency','Dollar')->exists()){
-            $amount = request()->amount * 3710;
-        }else{
             $amount = request()->amount;
+        }else{
+            $amount = request()->amount / $this->dollar_rates_instance->getDollarRate();
         }
         if(empty(request()->amount)){
             return redirect()->back()->withErrors("Please enter the amount of money to credit to this account");

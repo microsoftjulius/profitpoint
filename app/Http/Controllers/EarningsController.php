@@ -15,6 +15,7 @@ class EarningsController extends Controller
     {
         $this->middleware('auth');
         $this->investments_instance = new InvestmentsController;
+        $this->dollar_rates_instance  = new DollarRatesController;
     }
 
     protected function getEarnings(){
@@ -36,31 +37,6 @@ class EarningsController extends Controller
      */
     public function getMyTotalEarnings(){
         return Earnings::where('sponsor_id',auth()->user()->id)->sum('amount');// + $this->getDailyBonusEarnings();
-    }
-
-    /**
-     * This function gets the daily bonus of 2%
-     * The daily bonus is gotten everyday at 2:00pm 
-     * 
-     */
-    public function getDailyBonusEarnings(){
-        //Initializing the daily bonus
-        $daily_bonus = 0;
-        //get all the investments a user has made
-        $all_users_investments = Investments::join('users','users.id','investments.created_by')->select('investments.amount','users.id')->get();
-        //for every investment, get the day it was created
-        foreach($all_users_investments as $user_investments){
-            //check if the created_at date when subtracted from the day now is less than 100, if its greater, skip it
-            if($user_investments->created_at < Carbon::now()->subDays(101)){
-                //since its less than 100, generate the bonus
-                //this function is called in the cron job every 2:am
-                Earnings::create(array(
-                    'amount'     => 0.02 * $user_investments->amount,
-                    'sponsor_id' => $user_investments->id
-                ));
-            }
-        }
-        return 0;
     }
 
     /**
@@ -131,61 +107,61 @@ class EarningsController extends Controller
     /**
      * This function gets the users earings
      */
-     protected function getUserEarnings($sponsor_id){
+    protected function getUserEarnings($sponsor_id){
         $user_earnings = Earnings::where('sponsor_id',$sponsor_id)->get();
         return view('admin.user_earnings_view',compact('user_earnings'));
     }
+
+/**
+ * This function updates the user earnings
+ */
+    protected function updateUserEarnings($earnings_id){
+    if(empty(request()->earnings_edit)){
+            return redirect()->back()->withErrors("Please enter an amount to proceed");
+        }else{     
+        Earnings::where('id',$earnings_id)->update(array(
+            'amount' => request()->earnings_edit    
+        ));
+        }
+        return redirect()->back()->with('msg',"User earnings have been updated successfully");
+    }
     
     /**
-     * This function updates the user earnings
+     * This function gets the earnings update page
+    */
+    protected function getEarningsUpdatePage($earnings_id){
+        $earnings_to_edit = Earnings::where('id',$earnings_id)->get();
+        return view('admin.earnings_to_edit',compact('earnings_to_edit'));
+    }
+    
+    /**
+     * This function adds the user earnings
+     * commented and user uses edit
      */
-     protected function updateUserEarnings($earnings_id){
-        if(empty(request()->earnings_edit)){
-             return redirect()->back()->withErrors("Please enter an amount to proceed");
-         }else{     
-            Earnings::where('id',$earnings_id)->update(array(
-                'amount' => request()->earnings_edit    
-            ));
-         }
-         return redirect()->back()->with('msg',"User earnings have been updated successfully");
-     }
-     
-     /**
-      * This function gets the earnings update page
-      */
-      protected function getEarningsUpdatePage($earnings_id){
-          $earnings_to_edit = Earnings::where('id',$earnings_id)->get();
-          return view('admin.earnings_to_edit',compact('earnings_to_edit'));
-      }
-      
-      /**
-       * This function adds the user earnings
-       * commented and user uses edit
-       */
-      protected function addUserEarnings($earnings_id){
-          if(User::where('id',request()->user_id)->where('currency','Dollar')->exists()){
-              $amount = request()->amount * 3710;
-          }else{
-              $amount = request()->amount;
-          }
-          Earnings::create(array(
-            'sponsor_id' => request()->user_id,
-            'amount'     => $amount
-          ));
-            return redirect()->back()->with('msg',"You have added earnings to this user successfully");
-      }
-      /**
-       * This function deletes the user particular earning
-       */
-       protected function deleteUserParticularEarnings($earnings_id){
-           Earnings::where('id',$earnings_id)->delete();
-           return redirect()->back()->with('msg',"You successfully deleted an earning");
-       }
-       
-       /**
-        * get total earnings
-        */
-        public function getTotalEarnings(){
-            return Earnings::sum('amount');
+    protected function addUserEarnings($earnings_id){
+        if(User::where('id',request()->user_id)->where('currency','Dollar')->exists()){
+            $amount = request()->amount;
+        }else{
+            $amount = request()->amount / $this->dollar_rates_instance->getDollarRate();
         }
+        Earnings::create(array(
+        'sponsor_id' => request()->user_id,
+        'amount'     => $amount
+        ));
+        return redirect()->back()->with('msg',"You have added earnings to this user successfully");
+    }
+    /**
+     * This function deletes the user particular earning
+     */
+    protected function deleteUserParticularEarnings($earnings_id){
+        Earnings::where('id',$earnings_id)->delete();
+        return redirect()->back()->with('msg',"You successfully deleted an earning");
+    }
+    
+    /**
+    * get total earnings
+    */
+    public function getTotalEarnings(){
+        return Earnings::sum('amount');
+    }
 }

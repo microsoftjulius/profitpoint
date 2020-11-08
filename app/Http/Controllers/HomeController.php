@@ -9,7 +9,6 @@ use App\Withdraws;
 
 class HomeController extends Controller
 {
-    protected static $dollar = "3710";
     /**
      * Create a new controller instance.
      *
@@ -18,9 +17,10 @@ class HomeController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->earnings_instance    = new EarningsController;
-        $this->investments_instance = new InvestmentsController;
-        $this->withdraws_instance   = new WithdrawsController;
+        $this->dollar_rates_instance = new DollarRatesController;
+        $this->earnings_instance     = new EarningsController;
+        $this->investments_instance  = new InvestmentsController;
+        $this->withdraws_instance    = new WithdrawsController;
         
     }
 
@@ -31,24 +31,24 @@ class HomeController extends Controller
      */
     public function index()
     {
-        if(auth()->user()->currency == "Dollar"){
-            $total_earnings         = $this->earnings_instance->getMyTotalEarnings() / Self::$dollar;
-            $user_total_withdraws   = $this->earnings_instance->getMyTotalWithDraws()  / Self::$dollar;
+        if(auth()->user()->currency == "/="){
+            $total_earnings         = $this->earnings_instance->getMyTotalEarnings() * $this->dollar_rates_instance->getDollarRate();
+            $user_total_withdraws   = $this->earnings_instance->getMyTotalWithDraws()  * $this->dollar_rates_instance->getDollarRate();
             $user_total_balance     = $this->earnings_instance->getMyTotalBalance();
-            $user_total_investments = $this->investments_instance->calculateTotalInvestmentsMadeByLoggedInUser()  / Self::$dollar;
-            $today_investment       = $this->investments_instance->getTodaysInvestmentsForLoggedinUser() / Self::$dollar;
-            $monthly_investment     = $this->investments_instance->getThisMonthsInvestmentsForLoggedinUser() / Self::$dollar;
-            $todays_withdraws       = $this->earnings_instance->getWithdrawsMadeByLoggedinUserToday()  / Self::$dollar;
-            $months_withdraws       = $this->earnings_instance->getWithdrawsMadeByLoggedinUserThisMonth() / Self::$dollar;
-            $todays_earnings        = $this->earnings_instance->getTodaysEarnings() / Self::$dollar;
-            $this_months_earnings   = $this->earnings_instance->getThisMonthsEarnings() / Self::$dollar;
-            $todays_balance         = $this->earnings_instance->getLoggedInUsersTodaysEarnings() / Self::$dollar;
-            $months_balance         = $this->earnings_instance->getLoggedInUsersMonthsEarnings() / Self::$dollar;
-            $total_account_balance_to_admin = $this->getTotalAccountBalance() / Self::$dollar;
-            $total_investments_to_admin = $this->getTotalInvestments() / Self::$dollar;
-            $total_withdraws = $this->getTotalWithdraws() / Self::$dollar;
+            $user_total_investments = $this->investments_instance->calculateTotalInvestmentsMadeByLoggedInUser()  * $this->dollar_rates_instance->getDollarRate();
+            $today_investment       = $this->investments_instance->getTodaysInvestmentsForLoggedinUser() * $this->dollar_rates_instance->getDollarRate();
+            $monthly_investment     = $this->investments_instance->getThisMonthsInvestmentsForLoggedinUser() * $this->dollar_rates_instance->getDollarRate();
+            $todays_withdraws       = $this->earnings_instance->getWithdrawsMadeByLoggedinUserToday()  * $this->dollar_rates_instance->getDollarRate();
+            $months_withdraws       = $this->earnings_instance->getWithdrawsMadeByLoggedinUserThisMonth() * $this->dollar_rates_instance->getDollarRate();
+            $todays_earnings        = $this->earnings_instance->getTodaysEarnings() * $this->dollar_rates_instance->getDollarRate();
+            $this_months_earnings   = $this->earnings_instance->getThisMonthsEarnings() * $this->dollar_rates_instance->getDollarRate();
+            $todays_balance         = $this->earnings_instance->getLoggedInUsersTodaysEarnings() * $this->dollar_rates_instance->getDollarRate();
+            $months_balance         = $this->earnings_instance->getLoggedInUsersMonthsEarnings() * $this->dollar_rates_instance->getDollarRate();
+            $total_account_balance_to_admin = $this->getTotalAccountBalance() * $this->dollar_rates_instance->getDollarRate();
+            $total_investments_to_admin = $this->getTotalInvestments() * $this->dollar_rates_instance->getDollarRate();
+            $total_withdraws = $this->getTotalWithdraws() * $this->dollar_rates_instance->getDollarRate();
             $transactions    = $this->getTransactionsOverView();
-            $over_all_earnings = $this->earnings_instance->getTotalEarnings() / Self::$dollar;
+            $over_all_earnings = $this->earnings_instance->getTotalEarnings() * $this->dollar_rates_instance->getDollarRate();
         }else{
             $total_earnings         = $this->earnings_instance->getMyTotalEarnings();
             $user_total_withdraws   = $this->earnings_instance->getMyTotalWithDraws();
@@ -79,48 +79,6 @@ class HomeController extends Controller
         $all_deposits  = $this->investments_instance->getLoggedinUserInvestments();
         $transactions = collect([$all_deposits, $all_withdraws]);
         return $transactions;
-    }
-
-    /**
-     * This function gets the number of the earnings made per user per monday per week
-     */
-    private function calculateSundaysEarnings(){
-        return Earnings::whereDay('');
-    }
-
-    /**
-     * This function gets the number of earnings made per user per tuesday per week
-     */
-    private function calculcateMondaysEarnings(){
-
-    }
-
-    /**
-     * This function gets the number of earnings made per user per wednesday per week
-     */
-    private function calculateWednesdaysEarnings(){
-
-    }
-
-    /**
-     * This function gets the number of earnings made per thursday per week
-     */
-    private function calculateThursdaysEarnings(){
-
-    }
-
-    /**
-     * This function gets the number of earnings made per friday per week
-     */
-    private function calculateFridaysEarnings(){
-
-    }
-    
-    /**
-     * This function gets the number of earnings made per saturday per week
-     */
-    private function calculateSaturdayEarnings(){
-        
     }
 
     protected function getTotalAccountBalance(){

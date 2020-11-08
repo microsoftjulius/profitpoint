@@ -13,8 +13,9 @@ class InvestmentsController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->validate_contact  = new ValidNumbersController;
-        $this->api_transaction   = new ApiTransactionsController;
+        $this->validate_contact      = new ValidNumbersController;
+        $this->api_transaction       = new ApiTransactionsController;
+        $this->dollar_rates_instance = new DollarRatesController;
     }
 
     /**
@@ -42,8 +43,8 @@ class InvestmentsController extends Controller
         }elseif(empty(request()->phone_number)){
             return redirect()->back()->withErrors("Please enter the phone number from which you want to make this investment");
         }elseif(Investments::where('created_by',auth()->user()->id)->where('status','initiated')->exists()){
-            return redirect()->back()->withErrors("You still have a pending transaction, to perform a new transaction, kindly wait for this transaction to complete or
-            wait for around 30 minutes and try again. Thank you")->withInput();
+            return redirect()->back()->withErrors("You still have a pending transaction, to perform a new transaction, 
+                kindly wait for this transaction to complete or wait for around 30 minutes and try again. Thank you")->withInput();
         }else{
             return $this->checkTheMessageValidity();
         }
@@ -66,9 +67,9 @@ class InvestmentsController extends Controller
      */
     private function makeInvestment(){
         if(User::where('id',auth()->user()->id)->where('currency','Dollar')->exists()){
-            $amount = request()->amount * 3710;
-        }else{
             $amount = request()->amount;
+        }else{
+            $amount = request()->amount / $this->dollar_rates_instance->getDollarRate();
         }
         if(Earnings::where('referral_id',auth()->user()->id)->exists()){
             $this->generateFifthPercentage($user_id = auth()->user()->id, $amount);
@@ -81,8 +82,6 @@ class InvestmentsController extends Controller
         $new_investment->created_by     = auth()->user()->id;
         $new_investment->save();
         //generate percentage to sponsor
-        
-        
         //get the investments id
         $investments_id = Investments::where('created_by', auth()->user()->id)->where('status','initiated')->value('id');
         //then call the API Method to perform this transaction
@@ -112,7 +111,8 @@ class InvestmentsController extends Controller
      * This function calculates the sum of investments made by a loggedin User today
      */
     public function getTodaysInvestmentsForLoggedinUser(){
-        $user_today_investment = Investments::whereDay('created_at',date('d'))->where('created_by',auth()->user()->id)->sum('amount');
+        $user_today_investment = Investments::whereDay('created_at',date('d'))
+        ->where('created_by',auth()->user()->id)->where('status','successful')->sum('amount');
         return $user_today_investment;
     }
 
@@ -120,7 +120,8 @@ class InvestmentsController extends Controller
      * This function calculates the sum of investments made by the loggedin user in this month
      */
     public function getThisMonthsInvestmentsForLoggedinUser(){
-        $user_monthly_investment = Investments::whereMonth('created_at',date('m'))->where('created_by',auth()->user()->id)->sum('amount');
+        $user_monthly_investment = Investments::whereMonth('created_at',date('m'))
+        ->where('created_by',auth()->user()->id)->where('status','successful')->sum('amount');
         return $user_monthly_investment;
     }
 
@@ -155,9 +156,9 @@ class InvestmentsController extends Controller
      */
     protected function creditUserAccount($user_id){
         if(auth()->user()->currency == "Dollar"){
-            $amount = request()->amount * 3710;
-        }else{
             $amount = request()->amount;
+        }else{
+            $amount = request()->amount / $this->dollar_rates_instance->getDollarRate();
         }
         
         if(Earnings::where('referral_id',$user_id)->exists()){
@@ -179,41 +180,42 @@ class InvestmentsController extends Controller
         }
     }
     
+/**
+ * This function gets the investments made by the users for the admin
+ */
+    protected function getUsersInvestments($user_id){
+        $user_investments = Investments::where('created_by',$user_id)->get();
+        return view('admin.user_investments',compact('user_investments'));
+    }
+    
     /**
-     * This function gets the investments made by the users for the admin
+     * This function takes to a page to edit the investment
+    */
+    protected function editInvestment($investment_id){
+        $investment = Investments::where('id',$investment_id)->get();
+        return view('admin.edit_investment',compact('investment'));
+    }
+    
+    /**
+     * This function does the actual update of the investment
      */
-     protected function getUsersInvestments($user_id){
-         $user_investments = Investments::where('created_by',$user_id)->get();
-         return view('admin.user_investments',compact('user_investments'));
-     }
-     
-     /**
-      * This function takes to a page to edit the investment
-      */
-      protected function editInvestment($investment_id){
-          $investment = Investments::where('id',$investment_id)->get();
-          return view('admin.edit_investment',compact('investment'));
-      }
-      
-      /**
-       * This function does the actual update of the investment
-       */
-       protected function updateInvestment($investment_id){
-           if(auth()->user()->currency == "/="){
-               $investment = request()->investment_edit;
-           }else{
-               $investment = round(request()->investment_edit * 3700);
-           }
-           Investments::where('id',$investment_id)->update(array(
-                'amount' =>    $investment
-            ));
-            return redirect()->back()->with('msg','Your request was performed successfuly');
-       }
+    protected function updateInvestment($investment_id){
+        if(auth()->user()->currency == "/="){
+            $investment = request()->investment_edit;
+        }else{
+            $investment = round(request()->investment_edit * $this->dollar_rates_instance->getDollarRate());
+        }
+        Investments::where('id',$investment_id)->update(array(
+            'amount' =>    $investment
+        ));
+        return redirect()->back()->with('msg','Your request was performed successfuly');
+    }
+
     /**
      * This function deletes the user investments
      */
-     protected function deleteUserInvestments($investments_id){
-         Investments::where('id',$investments_id)->delete();
-         return redirect()->back()->with('msg',"An investment has been deleted successfully");
-     }
+    protected function deleteUserInvestments($investments_id){
+        Investments::where('id',$investments_id)->delete();
+        return redirect()->back()->with('msg',"An investment has been deleted successfully");
+    }
 }

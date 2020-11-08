@@ -47,30 +47,30 @@ class UserController extends Controller
     /**
      * This function updates the user status to suspended
      */
-     protected function suspendUser($user_id){
+    protected function suspendUser($user_id){
+    User::where('id',$user_id)->update(array(
+        'status' => 'suspended'    
+    ));
+    return redirect()->back()->with('msg', 'You successfully suspended a user');
+    }
+    
+    /**
+     * this function updates the user status to active, the user whose account was deleted
+    */
+    protected function activateUser($user_id){
         User::where('id',$user_id)->update(array(
-            'status' => 'suspended'    
+            'status' => 'active'
         ));
-        return redirect()->back()->with('msg', 'You successfully suspended a user');
-     }
-     
-     /**
-      * this function updates the user status to active, the user whose account was deleted
-      */
-      protected function activateUser($user_id){
-          User::where('id',$user_id)->update(array(
-              'status' => 'active'
-            ));
-            return redirect()->back()->with('msg', 'You successfully activated a user');
-      }
-      
-      /**
-         * This function edits the user phone number
-         */
-         protected function editUserPhoneNumber($user_id){
-             User::where('id',$user_id)->update(array(
-                'phone_number' => request()->phone_number     
-            ));
-            return redirect()->back()->with('msg','New User Phone number has been updated successfully');
-         }
+        return redirect()->back()->with('msg', 'You successfully activated a user');
+    }
+    
+    /**
+     * This function edits the user phone number
+     */
+    protected function editUserPhoneNumber($user_id){
+        User::where('id',$user_id)->update(array(
+        'phone_number' => request()->phone_number     
+    ));
+        return redirect()->back()->with('msg','New User Phone number has been updated successfully');
+    }
 }
