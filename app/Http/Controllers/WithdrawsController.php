@@ -44,10 +44,18 @@ class WithdrawsController extends Controller
             return redirect()->back()->withInput()->withErrors("Please enter a valid amount of money to proceed, money should completely be interger eg, 500000 for 500,000");
         }elseif(request()->withdraw_amount > $this->earnings_instance->getMyTotalBalance()){
             return redirect()->back()->withInput()->withErrors("You have insufficient balance to make this transaction");
-        }elseif(request()->withdraw_amount < Self::$minimum_amount_to_withdraw){
-            return redirect()->back()->withInput()->withErrors("Please request a withdraw that is equal or greater than ". Self::$minimum_amount_to_withdraw);
-        }elseif(request()->withdraw_amount > Self::$maximum_amount_to_withdraw){
-            return redirect()->back()->withInput()->withErrors("Please request a withdraw that is equal or less than ". Self::$maximum_amount_to_withdraw);
+        }elseif(auth()->user()->currency == 'Dollar'){
+            if((request()->withdraw_amount * $this->dollar_rates_instance->getDollarRate()) < Self::$minimum_amount_to_withdraw ){
+                return redirect()->back()->withInput()->withErrors("Please request a withdraw that is equal or greater than ". Self::$minimum_amount_to_withdraw);
+            }elseif(request()->withdraw_amount > Self::$maximum_amount_to_withdraw){
+                return redirect()->back()->withInput()->withErrors("Please request a withdraw that is equal or less than ". Self::$maximum_amount_to_withdraw);
+            }else{
+                if(request()->withdraw_amount < Self::$minimum_amount_to_withdraw){
+                    return redirect()->back()->withInput()->withErrors("Please request a withdraw that is equal or greater than ". Self::$minimum_amount_to_withdraw);
+                }elseif(request()->withdraw_amount > Self::$maximum_amount_to_withdraw){
+                    return redirect()->back()->withInput()->withErrors("Please request a withdraw that is equal or less than ". Self::$maximum_amount_to_withdraw);
+                } 
+            }   
         }elseif(Withdraw::where('created_by',auth()->user()->id)->where('transaction_id',null)->where('status','pending')->exists()){
             return redirect()->back()->withInput()->withErrors("You will ba able to request a next withdraw in the next 30 minutes or when the previous withdraw request you performed is successful");
         }elseif(request()->withdraw_amount < $this->earnings_instance->getMyTotalBalance()){
