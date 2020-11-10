@@ -20,7 +20,8 @@ class EarningsController extends Controller
 
     protected function getEarnings(){
         $logged_in_user_earnings = $this->getLoggedInUserEarnings();
-        return view('admin.earnings',compact('logged_in_user_earnings'));
+        $dollar_rate = $this->dollar_rates_instance->getDollarRate();
+        return view('admin.earnings',compact('logged_in_user_earnings','dollar_rate'));
     }
 
     /**
@@ -39,7 +40,7 @@ class EarningsController extends Controller
         if(auth()->user()->currency == "Dollar"){
             return Earnings::where('sponsor_id',auth()->user()->id)->sum('amount');
         }else{
-            return Earnings::where('sponsor_id',auth()->user()->id)->sum('amount') *  $this->dollar_rates_instance->getDollarRate();
+            return Earnings::where('sponsor_id',auth()->user()->id)->sum('amount') * $this->dollar_rates_instance->getDollarRate();
         }
     }
 

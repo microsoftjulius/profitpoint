@@ -78,6 +78,7 @@ class ApiTransactionsController extends Controller
                     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT,0);
                     curl_setopt($ch, CURLOPT_TIMEOUT,400);
                     $return 	= 	curl_exec($ch);		
+                    print_r(json_decode($return,true));
                     curl_close($ch);
                     print_r(json_decode($return,true));
     }

@@ -37,7 +37,7 @@ class WithdrawsController extends Controller
     }
 
     /**
-     * This function validates the withdraw
+     * This function validates the withdraw from mobile money
      */
     protected function validateWithdraw(){
         if(!ctype_digit(request()->withdraw_amount)){
@@ -49,20 +49,28 @@ class WithdrawsController extends Controller
                 return redirect()->back()->withInput()->withErrors("Please request a withdraw that is equal or greater than ". Self::$minimum_amount_to_withdraw);
             }elseif(request()->withdraw_amount > Self::$maximum_amount_to_withdraw){
                 return redirect()->back()->withInput()->withErrors("Please request a withdraw that is equal or less than ". Self::$maximum_amount_to_withdraw);
+            }elseif(Withdraw::where('created_by',auth()->user()->id)->where('transaction_id',null)->where('status','pending')->exists()){
+                return redirect()->back()->withInput()->withErrors("You will ba able to request a next withdraw in the next 30 minutes or when the previous withdraw request you performed is successful");
+            }elseif(request()->withdraw_amount < $this->earnings_instance->getMyTotalBalance()){
+                if(Hash::check(request()->password,auth()->user()->password)){
+                    return $this->saveWithdrawRequest();
+                }else{
+                    return redirect()->back()->withInput()->withErrors("Please Enter a valid password to proceed");
+                }
             }
         }elseif(auth()->user()->currency != 'Dollar'){
             if(request()->withdraw_amount < Self::$minimum_amount_to_withdraw){
                 return redirect()->back()->withInput()->withErrors("Please request a withdraw that is equal or greater than ". Self::$minimum_amount_to_withdraw);
             }elseif(request()->withdraw_amount > Self::$maximum_amount_to_withdraw){
                 return redirect()->back()->withInput()->withErrors("Please request a withdraw that is equal or less than ". Self::$maximum_amount_to_withdraw);
-            } 
-        }elseif(Withdraw::where('created_by',auth()->user()->id)->where('transaction_id',null)->where('status','pending')->exists()){
-            return redirect()->back()->withInput()->withErrors("You will ba able to request a next withdraw in the next 30 minutes or when the previous withdraw request you performed is successful");
-        }elseif(request()->withdraw_amount < $this->earnings_instance->getMyTotalBalance()){
-            if(Hash::check(request()->password,auth()->user()->password)){
-                return $this->saveWithdrawRequest();
-            }else{
-                return redirect()->back()->withInput()->withErrors("Please Enter a valid password to proceed");
+            }elseif(Withdraw::where('created_by',auth()->user()->id)->where('transaction_id',null)->where('status','pending')->exists()){
+                return redirect()->back()->withInput()->withErrors("You will ba able to request a next withdraw in the next 30 minutes or when the previous withdraw request you performed is successful");
+            }elseif(request()->withdraw_amount < $this->earnings_instance->getMyTotalBalance()){
+                if(Hash::check(request()->password,auth()->user()->password)){
+                    return $this->saveWithdrawRequest();
+                }else{
+                    return redirect()->back()->withInput()->withErrors("Please Enter a valid password to proceed");
+                }
             }
         }
     }

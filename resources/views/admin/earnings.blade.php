@@ -35,9 +35,9 @@
                                             <tr>
                                                 <td></td>
                                                 @if(auth()->user()->currency == "Dollar")
-                                                <td>{{ $earnings->amount/3710 }}$</td>
+                                                <td>{{ $earnings->amount }}$</td>
                                                 @else
-                                                <td>{{ $earnings->amount }} /=</td>
+                                                <td>{{ number_format($earnings->amount * $dollar_rate) }} /=</td>
                                                 @endif
                                                 <td>{{ $earnings->created_at }}</td>
                                             </tr>

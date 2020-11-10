@@ -102,9 +102,15 @@ class InvestmentsController extends Controller
      * This function calculates the amount of money a loggedin user has invested
      */
     public function calculateTotalInvestmentsMadeByLoggedInUser(){
-        return Investments::where('created_by',auth()->user()->id)
-        ->where('status','successful')
-        ->sum('amount');
+        if(auth()->user()->currency == "Dollar"){
+            return Investments::where('created_by',auth()->user()->id)
+            ->where('status','successful')
+            ->sum('amount');
+        }else{
+            return Investments::where('created_by',auth()->user()->id)
+            ->where('status','successful')
+            ->sum('amount') * $this->dollar_rates_instance->getDollarRate();
+        }
     }
 
     /**
