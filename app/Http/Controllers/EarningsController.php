@@ -36,14 +36,22 @@ class EarningsController extends Controller
      * earnings only happen for a user whose package has been successful
      */
     public function getMyTotalEarnings(){
-        return Earnings::where('sponsor_id',auth()->user()->id)->sum('amount');// + $this->getDailyBonusEarnings();
+        if(auth()->user()->currency == "Dollar"){
+            return Earnings::where('sponsor_id',auth()->user()->id)->sum('amount');
+        }else{
+            return Earnings::where('sponsor_id',auth()->user()->id)->sum('amount') *  $this->dollar_rates_instance->getDollarRate();
+        }
     }
 
     /**
      * This function gets the total withdraw amount of the loggedin User 
      */
     public function getMyTotalWithDraws(){
-        return Withdraws::where('created_by',auth()->user()->id)->where('status','completed')->sum('amount');
+        if(auth()->user()->currency == "Dollar"){
+            return Withdraws::where('created_by',auth()->user()->id)->where('status','completed')->sum('amount');
+        }else{
+            return Withdraws::where('created_by',auth()->user()->id)->where('status','completed')->sum('amount') * $this->dollar_rates_instance->getDollarRate();
+        }
     }
 
     /**
@@ -59,36 +67,60 @@ class EarningsController extends Controller
      * This function gets the sum of withdraws a loggedin User has made today
      */
     public function getWithdrawsMadeByLoggedinUserToday(){
-        return Withdraws::where('created_by',auth()->user()->id)->where('status','completed')
-        ->whereDay('created_at',date('d'))
-        ->sum('amount');
+        if(auth()->user()->currency == "Dollar"){
+            return Withdraws::where('created_by',auth()->user()->id)->where('status','completed')
+            ->whereDay('created_at',date('d'))
+            ->sum('amount');
+        }else{
+            return Withdraws::where('created_by',auth()->user()->id)->where('status','completed')
+            ->whereDay('created_at',date('d'))
+            ->sum('amount') * $this->dollar_rates_instance->getDollarRate();
+        }
     }
 
     /**
      * This function gets the sum of withdraws a loggedin User has made this month
      */
     public function getWithdrawsMadeByLoggedinUserThisMonth(){
-        return Withdraws::where('created_by',auth()->user()->id)->where('status','completed')
-        ->whereMonth('created_at',date('m'))
-        ->sum('amount');
+        if(auth()->user()->currency == "Dollar"){
+            return Withdraws::where('created_by',auth()->user()->id)->where('status','completed')
+            ->whereMonth('created_at',date('m'))
+            ->sum('amount');
+        }else{
+            return Withdraws::where('created_by',auth()->user()->id)->where('status','completed')
+            ->whereMonth('created_at',date('m'))
+            ->sum('amount') * $this->dollar_rates_instance->getDollarRate();
+        }
     }
 
     /**
      * This function gets the total earnings of a loggedin user on this day
      */
     public function getTodaysEarnings(){
-        return Earnings::where('sponsor_id',auth()->user()->id)
-        ->whereDay('created_at',date('d'))
-        ->sum('amount');// + $this->getDailyBonusEarnings();
+        if(auth()->user()->currency == "Dollar"){
+            return Earnings::where('sponsor_id',auth()->user()->id)
+            ->whereDay('created_at',date('d'))
+            ->sum('amount');
+        }else{
+            return Earnings::where('sponsor_id',auth()->user()->id)
+            ->whereDay('created_at',date('d'))
+            ->sum('amount') * $this->dollar_rates_instance->getDollarRate();
+        }
     }
 
     /**
      * This function gets the total earnings of a loggedin user on this day
      */
     public function getThisMonthsEarnings(){
-        return Earnings::where('sponsor_id',auth()->user()->id)
-        ->whereMonth('created_at',date('m'))
-        ->sum('amount');// + $this->getDailyBonusEarnings();
+        if(auth()->user()->currency == "Dollar"){
+            return Earnings::where('sponsor_id',auth()->user()->id)
+            ->whereMonth('created_at',date('m'))
+            ->sum('amount');
+        }else{
+            return Earnings::where('sponsor_id',auth()->user()->id)
+            ->whereMonth('created_at',date('m'))
+            ->sum('amount') * $this->dollar_rates_instance->getDollarRate();
+        }
     }
 
     /**
@@ -162,6 +194,10 @@ class EarningsController extends Controller
     * get total earnings
     */
     public function getTotalEarnings(){
-        return Earnings::sum('amount');
+        if(auth()->user()->currency == "Dollar"){
+            return Earnings::sum('amount');
+        }else{
+            return Earnings::sum('amount') * $this->dollar_rates_instance->getDollarRate();
+        }
     }
 }

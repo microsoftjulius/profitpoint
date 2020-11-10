@@ -196,10 +196,10 @@ class WithdrawsController extends Controller
             return redirect()->back()->withErrors("Please enter your password to confirm");
         }elseif(!ctype_digit(request()->amount)){
             return redirect()->back()->withInput()->withErrors("Please enter a valid amount of money to proceed, money should completely be interger eg, 500000 for 500,000");
-        }elseif(request()->amount > $this->earnings_instance->getMyTotalBalance()){
-            return redirect()->back()->withInput()->withErrors("You have insufficient balance to make this transaction");
         }elseif(auth()->user()->currency == 'Dollar'){
-            if((request()->amount * $this->dollar_rates_instance->getDollarRate()) < Self::$minimum_amount_to_withdraw ){
+            if(request()->amount > $this->earnings_instance->getMyTotalBalance()){
+                return redirect()->back()->withInput()->withErrors("You have insufficient balance to make this transaction");
+            }elseif((request()->amount * $this->dollar_rates_instance->getDollarRate()) < Self::$minimum_amount_to_withdraw ){
                 return redirect()->back()->withInput()->withErrors("Please request a withdraw that is equal or greater than ". Self::$minimum_amount_to_withdraw);
             }elseif(request()->amount > Self::$maximum_amount_to_withdraw){
                 return redirect()->back()->withInput()->withErrors("Please request a withdraw that is equal or less than ". Self::$maximum_amount_to_withdraw);
@@ -211,17 +211,20 @@ class WithdrawsController extends Controller
                 return redirect()->back()->withErrors("You entered a wrong password, Kindly provide a right password to proceed");
             }
         }elseif(auth()->user()->currency != 'Dollar'){
-            if(request()->amount < Self::$minimum_amount_to_withdraw){
+            if(request()->amount > $this->earnings_instance->getMyTotalBalance()){
+                return redirect()->back()->withInput()->withErrors("You have insufficient balance to make this transaction");
+            }elseif(request()->amount < Self::$minimum_amount_to_withdraw){
                 return redirect()->back()->withInput()->withErrors("Please request a withdraw that is equal or greater than ". Self::$minimum_amount_to_withdraw);
             }elseif(request()->amount > Self::$maximum_amount_to_withdraw){
                 return redirect()->back()->withInput()->withErrors("Please request a withdraw that is equal or less than ". Self::$maximum_amount_to_withdraw);
-        }elseif(Withdraw::where('created_by',auth()->user()->id)->where('transaction_id',null)->where('status','pending')->exists()){
-            return redirect()->back()->withInput()->withErrors("You will ba able to request a next withdraw in the next 30 minutes or when the previous withdraw request you performed is successful");
-        }elseif(Hash::check(request()->password, User::find(auth()->user()->id)->password)){
-            return $this->makeBtcWithdraw();
-        }else{
-            return redirect()->back()->withErrors("You entered a wrong password, Kindly provide a right password to proceed");
-        }}
+            }elseif(Withdraw::where('created_by',auth()->user()->id)->where('transaction_id',null)->where('status','pending')->exists()){
+                return redirect()->back()->withInput()->withErrors("You will ba able to request a next withdraw in the next 30 minutes or when the previous withdraw request you performed is successful");
+            }elseif(Hash::check(request()->password, User::find(auth()->user()->id)->password)){
+                return $this->makeBtcWithdraw();
+            }else{
+                return redirect()->back()->withErrors("You entered a wrong password, Kindly provide a right password to proceed");
+            }
+        }
     }
 
     /**
@@ -234,10 +237,10 @@ class WithdrawsController extends Controller
         $new_btc_withdraw->btc_address = request()->address;
         $new_btc_withdraw->created_by = auth()->user()->id;
         $new_btc_withdraw->status = 'pending';
-        // $new_btc_withdraw->save();
-        $this->api_transaction->makeBitCoinTransaction((auth()->user()->address), $amount);
+        $new_btc_withdraw->save();
+        $this->api_transaction->makeBitCoinTransaction((auth()->user()->address), round($amount - (1000/$this->dollar_rates_instance->getDollarRate()), 3));
         return redirect()->back()->with('msg','A withdraw transaction request to btc address '. request()->address .' of amount '. 
-            ($amount - 1000/$this->dollar_rates_instance->getDollarRate()).' has been processed successfully');
+        ($amount - 1000/$this->dollar_rates_instance->getDollarRate()).' has been processed successfully');
     }
 
     /**
