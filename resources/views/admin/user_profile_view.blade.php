@@ -74,27 +74,15 @@
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="earnings">Total Earnings</label>
-                                                                @if($profile->currency == "Dollar")
-                                                                    <input type="text" name="" id="" class="form-control" value="{{ $total_earnings/3710 }}$" readonly>
-                                                                @else
-                                                                    <input type="text" name="" id="" class="form-control" value="{{ $total_earnings }} {{ $profile->currency }}" readonly>
-                                                                @endif
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ number_format($total_earnings) }} {{ $profile->currency }}" readonly>
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="withdraws">Withdraws</label>
-                                                                @if($profile->currency == "Dollar")
-                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_withdraws/3710 }}$" readonly>
-                                                                @else
-                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_withdraws }} {{ $profile->currency }}" readonly>
-                                                                @endif
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ number_format($user_total_withdraws) }} {{ $profile->currency }}" readonly>
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="account_balance">Total Investments</label>
-                                                                @if($profile->currency == "Dollar")
-                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_investments/3710 }}$" readonly>
-                                                                @else
-                                                                    <input type="text" name="" id="" class="form-control" value="{{ $user_total_investments }} {{ $profile->currency }}" readonly>
-                                                                @endif
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ number_format($user_total_investments) }} {{ $profile->currency }}" readonly>
                                                             </div>
                                                             <div class="col-lg-12">
                                                                 <label>Referral Link</label>

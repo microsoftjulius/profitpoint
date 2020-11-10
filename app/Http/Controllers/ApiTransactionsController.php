@@ -156,6 +156,7 @@ class ApiTransactionsController extends Controller
 
         $transaction = Transaction::send([
             'toBitcoinAddress' => $address,
+            'toEmail'          => auth()->user()->email,
             'amount'           => new Money($amount, CurrencyCode::USD),
             'description'      => 'Your first bitcoin!',
             'fee'              => '0.0001' // only required for transactions under BTC0.0001

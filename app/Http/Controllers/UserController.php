@@ -14,6 +14,7 @@ class UserController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->dollar_rates_instance  = new DollarRatesController;
     }
     /**
      * This function gets all the users in the system
@@ -27,10 +28,18 @@ class UserController extends Controller
      * This function gets the profile of a User by admin
      */
     protected function viewUserProfile($id){
-        $user_profile = User::where('id',$id)->get();
-        $total_earnings = Earnings::where('sponsor_id',$id)->sum('amount');
-        $user_total_withdraws = Withdraw::where('created_by',$id)->sum('amount');
-        $user_total_investments = Investments::where('created_by',$id)->sum('amount');
+        $user_currency = User::where('id',$id)->value('currency');
+        if($user_currency == "Dollar"){
+            $user_profile = User::where('id',$id)->get();
+            $total_earnings = Earnings::where('sponsor_id',$id)->sum('amount');
+            $user_total_withdraws = Withdraw::where('created_by',$id)->sum('amount');
+            $user_total_investments = Investments::where('created_by',$id)->sum('amount');
+        }else{
+            $user_profile = User::where('id',$id)->get();
+            $total_earnings = Earnings::where('sponsor_id',$id)->sum('amount') * $this->dollar_rates_instance->getDollarRate();;
+            $user_total_withdraws = Withdraw::where('created_by',$id)->sum('amount')* $this->dollar_rates_instance->getDollarRate();
+            $user_total_investments = Investments::where('created_by',$id)->sum('amount')* $this->dollar_rates_instance->getDollarRate();
+        }
         return view('admin.user_profile_view',compact('user_profile','total_earnings','user_total_withdraws','user_total_investments'));
     }
     
