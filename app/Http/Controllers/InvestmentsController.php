@@ -44,7 +44,7 @@ class InvestmentsController extends Controller
             return redirect()->back()->withErrors("Please enter the phone number from which you want to make this investment");
         }elseif(Investments::where('created_by',auth()->user()->id)->where('status','initiated')->exists()){
             return redirect()->back()->withErrors("You still have a pending transaction, to perform a new transaction, 
-                kindly wait for this transaction to complete or wait for around 30 minutes and try again. Thank you")->withInput();
+                kindly wait for this transaction to complete or wait for around 3 minutes and try again. Thank you")->withInput();
         }else{
             return $this->checkTheMessageValidity();
         }
