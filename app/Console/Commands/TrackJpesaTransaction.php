@@ -66,7 +66,8 @@ class TrackJpesaTransaction extends Command
         curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT,0);
         curl_setopt($ch, CURLOPT_TIMEOUT,400);
-        $return 	= 	curl_exec($ch);		
+        $return 	= 	curl_exec($ch);
+        Log::info("Cron Job Works");		
         curl_close($ch);
         $api_status = json_decode($return,true)['api_status'];
         if($api_status == 'error'){
