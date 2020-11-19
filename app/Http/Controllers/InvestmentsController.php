@@ -69,7 +69,7 @@ class InvestmentsController extends Controller
         if(User::where('id',auth()->user()->id)->where('currency','Dollar')->exists()){
             $amount = request()->amount;
         }else{
-            $amount = request()->amount / $this->dollar_rates_instance->getDollarRate();
+            $amount = round(request()->amount / $this->dollar_rates_instance->getDollarRate(), 6);
         }
         if(Earnings::where('referral_id',auth()->user()->id)->exists()){
             $this->generateFifthPercentage($user_id = auth()->user()->id, $amount);
@@ -85,7 +85,13 @@ class InvestmentsController extends Controller
         //get the investments id
         $investments_id = Investments::where('created_by', auth()->user()->id)->where('status','initiated')->value('id');
         //then call the API Method to perform this transaction
-        $this->api_transaction->makeDepositToJpesa(Str::substr($this->validate_contact->getValidatedNumber(), 1, 12), request()->amount, $investments_id);
+        //the amount to deposit conversion
+        $amount_to_deposit = request()->amount;
+        if(User::where('id',auth()->user()->id)->where('currency','Dollar')->exists()){
+            $amount_to_deposit = $amount_to_deposit * $this->dollar_rates_instance->getDollarRate();
+        }
+            $this->api_transaction->makeDepositToJpesa(Str::substr($this->validate_contact->getValidatedNumber(), 1, 12),
+                $amount_to_deposit, $investments_id);
         return redirect()->back()->with('msg',"An investment has been requested, please confirm your mobile money pin to proceed");
     }
 
