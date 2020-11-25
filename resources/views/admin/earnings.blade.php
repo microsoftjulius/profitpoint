@@ -33,7 +33,7 @@
                                     <tbody>
                                         @foreach ($logged_in_user_earnings as $earnings)
                                             <tr>
-                                                <td></td>
+                                                <td>{{ md5(uniqid(rand(), true)) }}</td>
                                                 @if(auth()->user()->currency == "Dollar")
                                                 <td>{{ round($earnings->amount,1) }} $</td>
                                                 @else
