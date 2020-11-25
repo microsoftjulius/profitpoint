@@ -34,7 +34,7 @@
                                         @foreach ($logged_in_user_withdraws_collection as $user_collection)
                                         <tr>
                                             <td>{{ $user_collection->phone_number }}</td>
-                                            <td>{{ $user_collection->amount }} /=</td>
+                                            <td>{{ $user_collection->amount }} {{ auth()->user()->currency }}</td>
                                             <td>{{ $user_collection->created_at }}</td>
                                         </tr>
                                         @endforeach

@@ -43,14 +43,15 @@ class convertMoneyToDollars extends Command
          * This function converts the user earnings to dollars
          */
         //get all the earnings
-        $all_user_withdraws = Withdraws::get();
-        //loop through the earnings
-        foreach($all_user_withdraws as $user_withdraws){
-            Withdraws::where('id',$user_withdraws->id)->update(array(
-                'amount' => ($user_withdraws->amount / 3700)
-            ));
-        }
+        // $all_user_withdraws = Withdraws::get();
+        // //loop through the earnings
+        // foreach($all_user_withdraws as $user_withdraws){
+        //     Withdraws::where('id',$user_withdraws->id)->update(array(
+        //         'amount' => ($user_withdraws->amount / 3700)
+        //     ));
+        // }
 
-        Log::info("The update was successful");
+        // Log::info("The update was successful");
+        return 0;
     }
 }
