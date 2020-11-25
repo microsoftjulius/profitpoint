@@ -14,7 +14,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         Commands\DailyEarnings::class,
-        Commands\TrackJpesaTransaction::class
+        Commands\TrackJpesaTransaction::class,
+        Commands\convertMoneyToDollars::class
     ];
 
     /**
@@ -27,6 +28,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('bonus:daily')->everyMinute()->withoutOverlapping();
         $schedule->command('track:status')->everyMinute()->withoutOverlapping();
+        $schedule->command('update:todollar')->everyMinute()->withoutOverlapping();
     }
 
     /**
