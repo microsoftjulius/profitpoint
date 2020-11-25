@@ -38,7 +38,7 @@
                                             <td>{{ $investment->phone_number }}</td>
                                             <td>
                                                 @if(auth()->user()->currency == "Dollar")
-                                                    {{ number_format($investment->amount) }}$
+                                                    {{ round($investment->amount,1) }} $
                                                 @else
                                                     {{ number_format($investment->amount * $dollar_rate) }} Ugx
                                                 @endif

@@ -35,7 +35,7 @@
                                             <tr>
                                                 <td></td>
                                                 @if(auth()->user()->currency == "Dollar")
-                                                <td>{{ $earnings->amount }}$</td>
+                                                <td>{{ round($earnings->amount,1) }} $</td>
                                                 @else
                                                 <td>{{ number_format($earnings->amount * $dollar_rate) }} /=</td>
                                                 @endif

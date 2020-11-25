@@ -74,19 +74,19 @@
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="earnings">Total Earnings</label>
-                                                                    <input type="text" name="" id="" class="form-control"  value="{{ number_format($total_earnings) }} {{ auth()->user()->currency }}" readonly>
+                                                                    <input type="text" name="" id="" class="form-control"  value="{{ round($total_earnings,1) }} {{ auth()->user()->currency }}" readonly>
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="withdraws">Withdraws</label>
-                                                                    <input type="text" name="" id="" class="form-control" value="{{ number_format($user_total_withdraws) }} {{ auth()->user()->currency }}" readonly>
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ round($user_total_withdraws,1) }} {{ auth()->user()->currency }}" readonly>
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="account_balance">Account Balance</label>
-                                                                    <input type="text" name="" id="" class="form-control" value="{{ number_format($user_total_balance) }} {{ auth()->user()->currency }}" readonly>
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ round($user_total_balance,1) }} {{ auth()->user()->currency }}" readonly>
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="account_balance">Total Investments</label>
-                                                                    <input type="text" name="" id="" class="form-control" value="{{ number_format($user_total_investments) }} {{ auth()->user()->currency }}" readonly>
+                                                                    <input type="text" name="" id="" class="form-control" value="{{ round($user_total_investments,1) }} {{ auth()->user()->currency }}" readonly>
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <label for="account_balance">Referral Link</label>
