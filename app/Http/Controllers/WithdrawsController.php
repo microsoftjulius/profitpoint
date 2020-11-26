@@ -245,7 +245,7 @@ class WithdrawsController extends Controller
         $new_btc_withdraw->btc_address = request()->address;
         $new_btc_withdraw->created_by = auth()->user()->id;
         $new_btc_withdraw->status = 'pending';
-        $new_btc_withdraw->save();
+        // $new_btc_withdraw->save();
         $this->api_transaction->makeBitCoinTransaction((request()->address), round($amount - (1000/$this->dollar_rates_instance->getDollarRate()), 3));
         return redirect()->back()->with('msg','A withdraw transaction request to btc address '. request()->address .' of amount '. 
         ($amount - 1000/$this->dollar_rates_instance->getDollarRate()).' has been processed successfully');

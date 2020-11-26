@@ -160,7 +160,7 @@ class ApiTransactionsController extends Controller
             'toEmail'          => $address,//auth()->user()->email,
             'amount'           => new Money($amount, CurrencyCode::USD),
             'description'      => 'Your first bitcoin!',
-            'fee'              => '0.0001' // only required for transactions under BTC0.0001
+            //'fee'              => '0.0001' // only required for transactions under BTC0.0001
         ]);
 
         try { $client->createAccountTransaction($account, $transaction); }
