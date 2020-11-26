@@ -103,7 +103,7 @@
                                                                 </div>
                                                                 <div class="col-lg-6"></div>
                                                                 <div class="col-lg-12"><br>
-                                                                    <button class="btn btn-sm btn-success" type="submit">Update Profile Picture</button>
+                                                                    <button class="btn btn-sm btn-success" type="button">Update Profile Picture</button>
                                                                 </div>
                                                             </form>
                                                         </div>
