@@ -102,8 +102,7 @@ class EarningsController extends Controller
             $amount = Earnings::where('sponsor_id',auth()->user()->id)
             ->whereDay('created_at',date('d'))
             ->whereDate('created_at', '=', date('Y-m-d'))
-            ->get();
-            dd($amount);
+            ->sum('amount');
         }else{
             return Earnings::where('sponsor_id',auth()->user()->id)
             ->whereDay('created_at',date('d'))
