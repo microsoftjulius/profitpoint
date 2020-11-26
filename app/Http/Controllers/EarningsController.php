@@ -99,7 +99,7 @@ class EarningsController extends Controller
      */
     public function getTodaysEarnings(){
         if(auth()->user()->currency == "Dollar"){
-            $amount = Earnings::where('sponsor_id',auth()->user()->id)
+            return Earnings::where('sponsor_id',auth()->user()->id)
             ->whereDay('created_at',date('d'))
             ->whereDate('created_at', '=', date('Y-m-d'))
             ->sum('amount');
