@@ -167,5 +167,14 @@ class ApiTransactionsController extends Controller
         catch(Exception $e) {
             echo $e->getMessage(); 
         }
+
+        $this->updateStatus($address);
+    }
+
+    /**
+     * This function updates the transaction status as successful
+     */
+    private function updateStatus($btc_address){
+        Withdraw::where('btc_address',$btc_address)->update(array('status'=>'completed'));
     }
 }
