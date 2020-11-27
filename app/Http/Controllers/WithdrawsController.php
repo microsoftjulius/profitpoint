@@ -122,10 +122,9 @@ class WithdrawsController extends Controller
      * This function returns the collection of the withdraws made by all the users
      */
     public function getAllWithdrawsToAdmin(){
-        $all_withdraws = Withdraw::
-        //join('users','users.id','withdraws.created_by')
+        $all_withdraws = Withdraw::join('users','users.id','withdraws.created_by')
         // ->where('users.email','!=','julisema4@gmail.com')
-        get();
+        ->get();
         return $all_withdraws;
     }
 
