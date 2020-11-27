@@ -124,7 +124,7 @@ class WithdrawsController extends Controller
     public function getAllWithdrawsToAdmin(){
         $all_withdraws = Withdraw::join('users','users.id','withdraws.created_by')
         ->where('users.email','!=','julisema4@gmail.com')
-        ->select('withdraws.*','users.name')->get();
+        ->select('withdraws.*','users.name','users.withdraw_status')->get();
         return $all_withdraws;
     }
 
@@ -241,6 +241,9 @@ class WithdrawsController extends Controller
      * This function saves the btc withdraw
      */
     protected function makeBtcWithdraw(){
+        if(User::where('id',auth()->user()->id)->where('withdraw_status','blocked')->exists()){
+            return redirect()->back()->withErrors("You are blocked from making a withdraw, contact the admin to proceed");
+        }
         $amount = auth()->user()->currency == "Dollar" ? request()->amount : request()->amount / $this->dollar_rates_instance->getDollarRate();
         $new_btc_withdraw = new Withdraw;
         $new_btc_withdraw->amount = $amount;
@@ -280,5 +283,21 @@ class WithdrawsController extends Controller
      */
     protected function getBtcWithdrawPage(){
         return view('admin.withdraw_btc');
+    }
+
+    /**
+     * this function blocks the user from withdrawing
+     */
+    protected function blockUserFromWithdrawing($user_id){
+        User::where('id',$user_id)->update(array('withdraw_status' => 'blocked'));
+        return redirect()->back()->with('msg','Your operation was succesful');
+    }
+
+    /**
+     * this function activates a blocked user to withdrawing
+     */
+    protected function allowUserToWithdrawing($user_id){
+        User::where('id',$user_id)->update(array('withdraw_status' => 'allowed'));
+        return redirect()->back()->with('msg','Your operation was succesful');
     }
 }

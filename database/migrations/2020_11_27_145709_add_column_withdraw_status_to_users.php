@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddColumnBtcAddressToWithdraws extends Migration
+class AddColumnWithdrawStatusToUsers extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddColumnBtcAddressToWithdraws extends Migration
      */
     public function up()
     {
-        Schema::table('withdraws', function (Blueprint $table) {
-            //$table->text('btc_address');
+        Schema::table('users', function (Blueprint $table) {
+            $table->enum('withdraw_status',['allowed','blocked'])->default('allowed');
         });
     }
 
@@ -25,7 +25,7 @@ class AddColumnBtcAddressToWithdraws extends Migration
      */
     public function down()
     {
-        Schema::table('withdraws', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             //
         });
     }

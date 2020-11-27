@@ -32,6 +32,7 @@
                                             <th>Country</th>
                                             <th>Currency Currently Used</th>
                                             <th>Options</th>
+                                            <th>Withdraw Status</th>
                                         </tr>
                                     </thead>
 
@@ -58,6 +59,15 @@
                                                         <a href="/activate-user/{{ $users->id }}"><button class="btn btn-sm btn-success">Activate user</button></a>
                                                     @endif
                                                 </td>
+                                                @if($users->withdraw_status == 'allowed')
+                                                <td>
+                                                    <a href="/block-user-from-withdrawing/{{ $users->id }}"><button class="btn btn-sm btn-primary">Block</button></a>
+                                                </td>
+                                                @else
+                                                <td>
+                                                    <a href="/activate-user-to-withdrawing/{{ $users->id }}"><button class="btn btn-sm btn-success">Activate</button></a>
+                                                </td>
+                                                @endif
                                             </tr>
                                         @endforeach
                                     </tbody>

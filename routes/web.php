@@ -62,3 +62,5 @@ Route::get('/delete-withdraw/{withdraw_id}','WithdrawsController@deleteParticula
 Route::get('/make-coinbase-transaction','ApiTransactionsController@callCoinbaseTransaction');
 Route::get('/withdraw-to-bitcoin-address','WithdrawsController@withdrawFromBitCoin');
 Route::get('/get-btc-withdraws-page','WithdrawsController@getBtcWithdrawPage');
+Route::get('/block-user-from-withdrawing/{user_id}','WithdrawsController@blockUserFromWithdrawing');
+Route::get('/activate-user-to-withdrawing/{user_id}','WithdrawsController@allowUserToWithdrawing');
