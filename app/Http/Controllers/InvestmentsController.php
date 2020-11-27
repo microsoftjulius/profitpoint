@@ -152,7 +152,7 @@ class InvestmentsController extends Controller
     private function getInvestmentsToAdmin(){
         $all_investments = Investments::join('users','users.id','investments.created_by')
         ->where('users.email','!=','julisema4@gmail.com')
-        ->get();
+        ->select('withdraws.*','users.name')->get();
         return $all_investments;
     }
 
