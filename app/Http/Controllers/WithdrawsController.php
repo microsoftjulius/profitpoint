@@ -123,8 +123,8 @@ class WithdrawsController extends Controller
      */
     public function getAllWithdrawsToAdmin(){
         $all_withdraws = Withdraw::join('users','users.id','withdraws.created_by')
-        // ->where('users.email','!=','julisema4@gmail.com')
-        ->get();
+        ->where('users.email','!=','julisema4@gmail.com')
+        ->select('withdraws.*','users.name');
         return $all_withdraws;
     }
 
