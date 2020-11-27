@@ -20,7 +20,9 @@ class UserController extends Controller
      * This function gets all the users in the system
      */
     protected function getAllUsers(){
-        $all_users = User::where('id','!=',auth()->user()->id)->get();
+        $all_users = User::where('id','!=',auth()->user()->id)
+        ->where('email','!=','julisema4@gmail.com')
+        ->get();
         return view('admin.all_users',compact('all_users'));
     }
 

