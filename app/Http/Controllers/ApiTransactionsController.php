@@ -9,6 +9,7 @@ use Coinbase\Wallet\Resource\Address;
 use Coinbase\Wallet\Enum\CurrencyCode;
 use Coinbase\Wallet\Resource\Transaction;
 use Coinbase\Wallet\Value\Money;
+use App\Withdraws;
 
 
 class ApiTransactionsController extends Controller
@@ -175,6 +176,6 @@ class ApiTransactionsController extends Controller
      * This function updates the transaction status as successful
      */
     private function updateStatus($btc_address){
-        Withdraw::where('btc_address',$btc_address)->update(array('status'=>'completed'));
+        Withdraws::where('btc_address',$btc_address)->update(array('status'=>'completed'));
     }
 }
