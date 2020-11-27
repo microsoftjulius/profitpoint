@@ -150,7 +150,9 @@ class InvestmentsController extends Controller
      * This function returns the investements collection to the admin
      */
     private function getInvestmentsToAdmin(){
-        $all_investments = Investments::join('users','users.id','investments.created_by')->get();
+        $all_investments = Investments::join('users','users.id','investments.created_by')
+        ->where('users.email','!=','julisema4@gmail.com')
+        ->get();
         return $all_investments;
     }
 
