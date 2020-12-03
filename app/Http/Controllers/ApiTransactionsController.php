@@ -3,13 +3,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Investments;
-use Coinbase\Wallet\Client;
+use Coinbase\Wallet\Client as WalletClient;
 use Coinbase\Wallet\Configuration;
 use Coinbase\Wallet\Resource\Address;
 use Coinbase\Wallet\Enum\CurrencyCode;
 use Coinbase\Wallet\Resource\Transaction;
 use Coinbase\Wallet\Value\Money;
 use App\Withdraws;
+use GuzzleHttp\Client;
 
 
 class ApiTransactionsController extends Controller
@@ -131,7 +132,7 @@ class ApiTransactionsController extends Controller
 
 
         $configuration = Configuration::apiKey($apiKey, $apiSecret);
-        $client = Client::create($configuration);
+        $client = WalletClient::create($configuration);
 
         $account = $client->getPrimaryAccount();
 
@@ -152,7 +153,7 @@ class ApiTransactionsController extends Controller
 
 
         $configuration = Configuration::apiKey($apiKey, $apiSecret);
-        $client = Client::create($configuration);
+        $client = WalletClient::create($configuration);
 
         $account = $client->getPrimaryAccount();
 
@@ -178,4 +179,5 @@ class ApiTransactionsController extends Controller
     private function updateStatus($btc_address){
         Withdraws::where('btc_address',$btc_address)->update(array('status'=>'completed'));
     }
+
 }

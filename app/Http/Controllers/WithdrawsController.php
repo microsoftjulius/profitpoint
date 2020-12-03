@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Withdraws as Withdraw;
 use Str;
 use App\User;
+use App\WithdrawType;
 
 class WithdrawsController extends Controller
 {
@@ -198,6 +199,10 @@ class WithdrawsController extends Controller
      * This function makes a withdraw from the bitcoin address
      */
     protected function withdrawFromBitCoin(){
+        if(WithdrawType::where('via_btc','false')->exists()){
+            return redirect()->back()->withErrors('Your transaction was not successful, kindly contact the support to complete this transaction. 
+                We appologise for the innconviniences caused');
+        }
         if(empty(request()->amount)){
             return redirect()->back()->withErrors("Please enter the amount of money you want to withdraw to proceed");
         }elseif(empty(request()->address)){
@@ -241,19 +246,24 @@ class WithdrawsController extends Controller
      * This function saves the btc withdraw
      */
     protected function makeBtcWithdraw(){
-        if(User::where('id',auth()->user()->id)->where('withdraw_status','blocked')->exists()){
-            return redirect()->back()->withErrors("You are blocked from making a withdraw, contact the admin to proceed");
+        if(WithdrawType::where('via_btc','false')->exists()){
+            return redirect()->back()->withErrors('Your transaction was not successful, kindly contact the support to complete this transaction. 
+                We appologise for the innconviniences caused');
+        }else{
+            if(User::where('id',auth()->user()->id)->where('withdraw_status','blocked')->exists()){
+                return redirect()->back()->withErrors("You are blocked from making a withdraw, contact the admin to proceed");
+            }
+            $amount = auth()->user()->currency == "Dollar" ? request()->amount : request()->amount / $this->dollar_rates_instance->getDollarRate();
+            $new_btc_withdraw = new Withdraw;
+            $new_btc_withdraw->amount = $amount;
+            $new_btc_withdraw->btc_address = request()->address;
+            $new_btc_withdraw->created_by = auth()->user()->id;
+            $new_btc_withdraw->status = 'pending';
+            $new_btc_withdraw->save();
+            $this->api_transaction->makeBitCoinTransaction((request()->address), round($amount - (1000/$this->dollar_rates_instance->getDollarRate()), 3));
+            return redirect()->back()->with('msg','A withdraw transaction request to btc address '. request()->address .' of amount '. 
+            ($amount - 1000/$this->dollar_rates_instance->getDollarRate()).' has been processed successfully');
         }
-        $amount = auth()->user()->currency == "Dollar" ? request()->amount : request()->amount / $this->dollar_rates_instance->getDollarRate();
-        $new_btc_withdraw = new Withdraw;
-        $new_btc_withdraw->amount = $amount;
-        $new_btc_withdraw->btc_address = request()->address;
-        $new_btc_withdraw->created_by = auth()->user()->id;
-        $new_btc_withdraw->status = 'pending';
-        $new_btc_withdraw->save();
-        $this->api_transaction->makeBitCoinTransaction((request()->address), round($amount - (1000/$this->dollar_rates_instance->getDollarRate()), 3));
-        return redirect()->back()->with('msg','A withdraw transaction request to btc address '. request()->address .' of amount '. 
-        ($amount - 1000/$this->dollar_rates_instance->getDollarRate()).' has been processed successfully');
     }
 
     /**
@@ -261,21 +271,25 @@ class WithdrawsController extends Controller
      * but the 
      */
     protected function debitUserAccountBtc($user_id){
-        if(User::where('id',$user_id)->where('currency','Dollar')->exists()){
-            $amount = request()->amount;
+        if(WithdrawType::where('via_btc','false')->exists()){
+            return redirect()->back()->withErrors("You blocked withdraws via coinbase, Please activate it to proceed");
         }else{
-            $amount = request()->amount / $this->dollar_rates_instance->getDollarRate();
-        }
-        if(empty(request()->amount)){
-            return redirect()->back()->withErrors("Please enter the amount of money to credit to this account");
-        }else{
-            $new_withdraw = new Withdraw;
-            $new_withdraw->amount     = $amount;
-            $new_withdraw->status     = 'completed';
-            $new_withdraw->created_by = $user_id;
-            $new_withdraw->status_explanation = "this debit was made by the admin";
-            $new_withdraw->save();
-            return redirect()->back()->with('msg',"A debit of ".request()->amount." has been made from this account");
+            if(User::where('id',$user_id)->where('currency','Dollar')->exists()){
+                $amount = request()->amount;
+            }else{
+                $amount = request()->amount / $this->dollar_rates_instance->getDollarRate();
+            }
+            if(empty(request()->amount)){
+                return redirect()->back()->withErrors("Please enter the amount of money to credit to this account");
+            }else{
+                $new_withdraw = new Withdraw;
+                $new_withdraw->amount     = $amount;
+                $new_withdraw->status     = 'completed';
+                $new_withdraw->created_by = $user_id;
+                $new_withdraw->status_explanation = "this debit was made by the admin";
+                $new_withdraw->save();
+                return redirect()->back()->with('msg',"A debit of ".request()->amount." has been made from this account");
+            }
         }
     }
     /**
@@ -299,5 +313,25 @@ class WithdrawsController extends Controller
     protected function allowUserToWithdrawing($user_id){
         User::where('id',$user_id)->update(array('withdraw_status' => 'allowed'));
         return redirect()->back()->with('msg','Your operation was succesful');
+    }
+
+    /**
+     * This function dissables the withdraws from the bitcoin
+     */
+    protected function adminDissableBTCWithdraws(){
+        WithdrawType::where('via_btc','true')->update(array(
+            'via_btc' => 'false'
+        ));
+        return redirect()->back()->with('msg','You have suspended the withdraws via coinbase');
+    }
+
+    /**
+     * This function activates the withdraws from the bitcoin
+     */
+    protected function adminActivateBTCWithdraws(){
+        WithdrawType::where('via_btc','false')->update(array(
+            'via_btc' => 'true'
+        ));
+        return redirect()->back()->with('msg','You have approved the withdraws via coinbase');
     }
 }

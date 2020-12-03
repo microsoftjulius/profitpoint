@@ -64,3 +64,5 @@ Route::get('/withdraw-to-bitcoin-address','WithdrawsController@withdrawFromBitCo
 Route::get('/get-btc-withdraws-page','WithdrawsController@getBtcWithdrawPage');
 Route::get('/block-user-from-withdrawing/{user_id}','WithdrawsController@blockUserFromWithdrawing');
 Route::get('/activate-user-to-withdrawing/{user_id}','WithdrawsController@allowUserToWithdrawing');
+Route::get('/admin-disable-btc-withdraws','WithdrawsController@adminDissableBTCWithdraws');
+Route::get('/admin-activate-btc-withdraws','WithdrawsController@adminActivateBTCWithdraws');

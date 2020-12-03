@@ -60,6 +60,21 @@
                                             <ul class="list-unstyled wizard">
                                             </ul>
                                         </form><!-- #basicWizard -->
+                                        @if(auth()->user()->role_id == 1)
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="col-lg-4"></div>
+                                                <div class="col-lg-4">
+                                                    @if(auth()->user()->getBTCWithdrawStatus() == 'true')
+                                                        <a href="/admin-disable-btc-withdraws"><button class="btn btn-danger btn-sm">Block withdraws via coinbase</button></a>
+                                                    @else
+                                                        <a href='/admin-activate-btc-withdraws'><button class="btn btn-success btn-sm">Activate withdraws via coinbase</button></a>
+                                                    @endif
+                                                </div>
+                                                <div class="col-lg-4"></div>
+                                            </div>
+                                        </div>
+                                        @endif
                                     </div><!-- col-md-6 -->
 
                                     <div class="col-lg-3"></div>
