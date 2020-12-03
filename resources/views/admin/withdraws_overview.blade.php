@@ -15,10 +15,19 @@
                     @include('layouts.breadcrumb')
                     <div class="contentpanel">
                         <div class="row">
+                            <div class="row">
+                                <div class="col-lg-12 text-right">
+                                    @if(auth()->user()->getBTCWithdrawStatus() == 'true')
+                                        <a href="/admin-disable-btc-withdraws"><button class="btn btn-danger btn-sm">Block withdraws via coinbase</button></a>
+                                    @else
+                                        <a href='/admin-activate-btc-withdraws'><button class="btn btn-success btn-sm">Activate withdraws via coinbase</button></a>
+                                    @endif
+                                </div>
+                            </div>
                             <div class="panel panel-primary-head">
                                 <div class="panel-heading">
                                     <h4 class="panel-title">{{ request()->route()->getName() }}</h4>
-                                    <p>A table showing the Earnings {{ auth()->user()->name }} has made</p>
+                                    <p>A table showing the withdraws</p>
                                 </div><!-- panel-heading -->
                                 
                                 <table id="basicTable" class="table table-striped table-bordered responsive">
