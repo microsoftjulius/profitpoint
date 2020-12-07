@@ -12,7 +12,7 @@ class ValidNumbersController extends Controller
     static protected $to_append_valid_contacts = ['077','078','070','079','071','075','075','020','039','041'];
     /**
      * Check if the number has 13 figures. if so, 
-     * check if it has +256 as the first figures
+     * check if it has +256 or +254 as the first figures
      * check if the other numbers are in the array of valid numbers
      * if so, save it
      * else, tell the user the required numbers must have 256 as the starting number

