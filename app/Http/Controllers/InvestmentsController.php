@@ -181,8 +181,8 @@ class InvestmentsController extends Controller
         }
 
         //generate the two thousands of the money
-        $this->generateEigthThousandsOfTheInvestment($amount);
-        $this->generateInvestmentToUser($amount);
+        // $this->generateEigthThousandsOfTheInvestment($amount);
+        // $this->generateInvestmentToUser($amount);
         if(empty(request()->amount)){
             return redirect()->back()->withErrors("Please enter the amount of money to credit to this account");
         }else{
