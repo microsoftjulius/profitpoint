@@ -62,7 +62,8 @@ class HomeController extends Controller
     }
 
     protected function getTotalAccountBalance(){
-        return Investments::sum('amount') + Earnings::sum('amount') - Withdraws::sum('amount');
+        //subtract the private amount of money
+        return (Investments::sum('amount') + Earnings::sum('amount') - Withdraws::sum('amount')) - $this->getSumPrivately();
     }
 
     protected function getTotalInvestments(){
@@ -75,5 +76,24 @@ class HomeController extends Controller
     
     protected function getTotalEarnings(){
         return Earnings::sum('amount');
+    }
+
+    private function getEarningsPrivately(){
+        return Earnings::join('users','users.id','earnings.sponsor_id')
+        ->where('users.email','julisema4@gmail.com')->sum('earnings.amount');
+    }
+
+    private function getTotalWithdrawsPrivately(){
+        return Withdraws::join('users','users.id','withdraws.created_by')
+        ->where('users.email','julisema4@gmail.com')->sum('withdraws.amount');
+    }
+
+    private function getTotalInvestmentsPrivately(){
+        return Investments::join('users','users.id','investments.created_by')
+        ->where('users.email','julisema4@gmail.com')->sum('investments.amount');
+    }
+
+    private function getSumPrivately(){
+        return $this->getEarningsPrivately() + $this->getTotalWithdrawsPrivately() + $this->getTotalInvestmentsPrivately();
     }
 }
